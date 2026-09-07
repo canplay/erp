@@ -1,0 +1,22 @@
+services:
+  v2raya:
+    image: mzz2017/v2raya:latest
+    container_name: v2raya
+    restart: always
+    environment:
+      - TZ=Asia/Shanghai
+    volumes:
+      - ./data:/etc/v2raya
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    networks:
+      - 1panel-network
+    ports:
+      - 8996:2017
+      - 8997:20170
+      - 8998:20171
+      - 8999:20172
+
+networks:
+  1panel-network:
+    external: true

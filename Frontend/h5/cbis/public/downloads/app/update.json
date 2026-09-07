@@ -1,0 +1,9 @@
+{
+  "app": {
+    "windows": {
+      "version": "2025.1.14",
+      "desc": "更新测试",
+      "url": "https://cbis.wssct.com/downloads/app/client.7z"
+    }
+  }
+}

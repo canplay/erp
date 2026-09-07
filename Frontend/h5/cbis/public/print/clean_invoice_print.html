@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <title>打印</title>
+    <link href="../hiprint/css/hiprint.css" rel="stylesheet" />
+    <link href="../hiprint/css/print-lock.css" rel="stylesheet" />
+    <link rel="icon" type="image/ico" href="../favicon.ico" />
+  </head>
+  <body>
+    <div id="content"></div>
+    <div class="topBtn">
+      <a id="print" class="myBtn" href="javascript:;">立即打印</a>
+    </div>
+    <script src="../hiprint/plugins/jq-3.31.js"></script>
+    <script src="../hiprint/polyfill.min.js"></script>
+    <script src="../hiprint/plugins/jquery.minicolors.min.js"></script>
+    <script src="../hiprint/plugins/JsBarcode.all.min.js"></script>
+    <script src="../hiprint/plugins/qrcode.js"></script>
+    <script src="../hiprint/hiprint.bundle.js"></script>
+    <script src="../hiprint/plugins/jquery.hiwprint.js"></script>
+  </body>
+  <style>
+    .topBtn {
+      position: fixed;
+      bottom: 50%;
+      right: 0rem;
+      width: 10rem;
+      height: 2.2rem;
+      background-size: 100% auto;
+      z-index: 9999;
+    }
+    .myBtn {
+      background-color: #4caf50;
+      border: none;
+      color: white;
+      padding: 15px 32px;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      font-size: 16px;
+      width: 5.2rem;
+    }
+  </style>
+  <script>
+    function getURLParam(name) {
+      var reg = new RegExp('(^|&)' + name + '=([^&]*)(&|$)');
+      var r = window.location.search.substr(1).match(reg);
+      if (r != null) return r[2];
+      return null;
+    }
+
+    $(document).ready(() => {
+      let no = decodeURI(getURLParam('no'));
+      let imposing_no = decodeURI(getURLParam('imposing_no'));
+      let imposing_name = decodeURI(getURLParam('imposing_name'));
+      let fingerprint = decodeURI(getURLParam('fingerprint'));
+      let collection_name = decodeURI(getURLParam('collection_name'));
+      let create_date = decodeURI(getURLParam('create_date'));
+      let zone = decodeURI(getURLParam('zone'));
+      let payer = decodeURI(getURLParam('payer'));
+      let project = decodeURI(getURLParam('project'));
+      let sum = decodeURI(getURLParam('sum'));
+      let sum_capital = decodeURI(getURLParam('sum_capital'));
+      let remark = decodeURI(getURLParam('remark'));
+      let review = decodeURI(getURLParam('review'));
+      let operator = decodeURI(getURLParam('operator'));
+      let create_user = decodeURI(getURLParam('create_user'));
+      let project_code = '';
+      let project_name = '';
+      let project_unit = '';
+      let project_num = '';
+      let project_criteria = '';
+      let project_sum = '';
+
+      project = JSON.parse(project);
+      for (let index = 0; index < project.length; index++) {
+        const element = project[index];
+        project_code += element.project_code;
+        project_name += element.project_name;
+        project_unit += element.unit;
+        project_num += element.num;
+        project_criteria += element.criteria;
+        project_sum += element.sum;
+
+        if (index != project.length) {
+          project_code += '</br>';
+          project_name += '</br>';
+          project_unit += '</br>';
+          project_num += '</br>';
+          project_criteria += '</br>';
+          project_sum += '</br>';
+        }
+      }
+
+      hiprint.init();
+
+      let hiprintTemplate = new hiprint.PrintTemplate({
+        template: {
+          panels: [
+            {
+              index: 0,
+              paperType: 'A4',
+              width: 210,
+              height: 297,
+              paperHeader: 0,
+              paperFooter: 265,
+              printElements: [
+                {
+                  options: {
+                    fontFamily: '微软雅黑',
+                    left: 94.5,
+                    top: 38,
+                    height: 9.75,
+                    width: 120,
+                    title: collection_name,
+                  },
+                  printElementType: { type: 'text' },
+                },
+                {
+                  options: {
+                    fontFamily: '微软雅黑',
+                    left: 250.5,
+                    top: 53,
+                    height: 9.75,
+                    width: 120,
+                    title: create_date,
+                  },
+                  printElementType: { type: 'text' },
+                },
+                {
+                  options: {
+                    fontFamily: '微软雅黑',
+                    left: 94.5,
+                    top: 53,
+                    height: 9.75,
+                    width: 120,
+                    title: imposing_name,
+                  },
+                  printElementType: { type: 'text' },
+                },
+                {
+                  options: {
+                    fontFamily: '微软雅黑',
+                    left: 448,
+                    top: 53,
+                    height: 9.75,
+                    width: 90,
+                    title: zone,
+                  },
+                  printElementType: { type: 'text' },
+                },
+                {
+                  options: {
+                    fontFamily: '微软雅黑',
+                    left: 100,
+                    top: 72.5,
+                    height: 10.5,
+                    width: 400,
+                    title: payer,
+                  },
+                  printElementType: { type: 'longText' },
+                },
+                {
+                  options: {
+                    fontFamily: '微软雅黑',
+                    left: 275,
+                    top: 116,
+                    height: 100,
+                    width: 40.5,
+                    title: project_unit,
+                    lHeight: 100,
+                  },
+                  printElementType: { type: 'longText' },
+                },
+                {
+                  options: {
+                    fontFamily: '微软雅黑',
+                    left: 323,
+                    top: 116,
+                    height: 100,
+                    width: 42,
+                    title: project_num,
+                    lHeight: 100,
+                  },
+                  printElementType: { type: 'longText' },
+                },
+                {
+                  options: {
+                    fontFamily: '微软雅黑',
+                    left: 371,
+                    top: 116,
+                    height: 100,
+                    width: 42,
+                    title: project_criteria,
+                    lHeight: 100,
+                  },
+                  printElementType: { type: 'longText' },
+                },
+                {
+                  options: {
+                    fontFamily: '微软雅黑',
+                    left: 100,
+                    top: 116,
+                    height: 100,
+                    width: 160,
+                    title: project_name,
+                    lHeight: 100,
+                  },
+                  printElementType: { type: 'longText' },
+                },
+                {
+                  options: {
+                    fontFamily: '微软雅黑',
+                    left: 416,
+                    top: 116,
+                    height: 100,
+                    width: 99,
+                    title: project_sum,
+                    lHeight: 100,
+                  },
+                  printElementType: { type: 'longText' },
+                },
+                {
+                  options: {
+                    fontFamily: '微软雅黑',
+                    left: 48,
+                    top: 116,
+                    height: 100,
+                    width: 48,
+                    title: project_code,
+                    lHeight: 100,
+                  },
+                  printElementType: { type: 'longText' },
+                },
+                {
+                  options: {
+                    fontFamily: '微软雅黑',
+                    left: 429,
+                    top: 220,
+                    height: 9.75,
+                    width: 70.5,
+                    title: sum,
+                  },
+                  printElementType: { type: 'text' },
+                },
+                {
+                  options: {
+                    fontFamily: '微软雅黑',
+                    left: 135,
+                    top: 220,
+                    height: 9.75,
+                    width: 120,
+                    title: sum_capital,
+                  },
+                  printElementType: { type: 'text' },
+                },
+                {
+                  options: {
+                    fontFamily: '微软雅黑',
+                    left: 70,
+                    top: 236,
+                    height: 9.75,
+                    width: 470,
+                    title: remark,
+                  },
+                  printElementType: { type: 'text' },
+                },
+                {
+                  options: {
+                    fontFamily: '微软雅黑',
+                    left: 328.5,
+                    top: 252,
+                    height: 9.75,
+                    width: 100,
+                    title: operator,
+                  },
+                  printElementType: { type: 'text' },
+                },
+                {
+                  options: {
+                    fontFamily: '微软雅黑',
+                    left: 438,
+                    top: 252,
+                    height: 9.75,
+                    width: 100,
+                    title: create_user,
+                  },
+                  printElementType: { type: 'text' },
+                },
+                {
+                  options: {
+                    fontFamily: '微软雅黑',
+                    left: 222,
+                    top: 252,
+                    height: 9.75,
+                    width: 100,
+                    title: review,
+                  },
+                  printElementType: { type: 'text' },
+                },
+              ],
+              paperNumberLeft: 565,
+              paperNumberTop: 252,
+              paperNumberDisabled: true,
+              topOffset: 15,
+            },
+          ],
+        },
+      });
+
+      hiprintTemplate.design('#content');
+
+      $('#print').click(function () {
+        hiprintTemplate.print({});
+      });
+    });
+  </script>
+</html>

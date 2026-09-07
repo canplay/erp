@@ -1,0 +1,32 @@
+# To make it easier to self-host, we have a preset docker compose config that also
+# has a container with a Postgres instance running.
+# You can tweak around this file to match your instances
+
+services:
+  # The service that spins up all 3 services at once in one container
+  proxyscotch:
+    container_name: proxyscotch
+    image: hoppscotch/proxyscotch
+    restart: unless-stopped
+    ports:
+      - 9159:9159
+    networks:
+      - 1panel-network
+
+  hoppscotch-aio:
+    container_name: hoppscotch
+    image: hoppscotch/hoppscotch
+    restart: unless-stopped
+    env_file:
+      - ./.env
+    ports:
+      - 3100:3000
+      - 3101:3100
+      - 3102:3170
+      - 3103:80
+    networks:
+      - 1panel-network
+
+networks:
+  1panel-network:
+    external: true

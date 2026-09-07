@@ -1,0 +1,29 @@
+Frontend/h5/scoreboard/log.log
+/Frontend/h5/scoreboard/old
+
+# --- 安全：服务配置与密钥（.env 按决策3提交随机临时值，不忽略） ---
+*.pem
+*.key
+*.p12
+*.pfx
+*.crt
+*.cer
+# 后端服务配置走 config.example，不提交真实值
+Backend/**/config.json
+Backend/**/config_debug.json
+Backend/**/config.lua
+!config.example.json
+*.sql.dump
+.hermes/
+
+# --- 编译产物（含真实密钥） ---
+build/
+dist/
+*.obj
+*.exe
+*.dll
+*.pdb
+*.lib
+*.so
+*.dylib
+node_modules/

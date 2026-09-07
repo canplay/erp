@@ -1,0 +1,19 @@
+[package]
+name = "utility"
+version = "0.1.0"
+edition = "2024"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+log = "*"
+log4rs = "*"
+serde = "*"
+serde_json = "*"
+tokio-postgres = { version = "*", features = ["with-chrono-0_4", "with-uuid-0_8", "with-serde_json-1"] }
+chrono = { version = "*", features = ["serde"] }
+deadpool-postgres = "*"
+tokio = { version = "*", features = ["full"] }
+failure = "*"
+geo = "*"
+ctrlc = "*"

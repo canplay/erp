@@ -1,0 +1,41 @@
+{
+  "easycom": {
+    "autoscan": true,
+    "custom": {
+      "^uni-(.*)": "@dcloudio/uni-ui/lib/uni-$1/uni-$1.vue"
+    }
+  },
+  "pages": [
+    //pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
+    {
+      "path": "pages/index/index",
+      "style": {
+        "navigationBarTitleText": "七都商合"
+      }
+    },
+    {
+      "path": "pages/index/signin",
+      "style": {
+        "navigationBarTitleText": "七都商合"
+      }
+    },
+    {
+      "path": "pages/index/goto",
+      "style": {
+        "navigationBarTitleText": "七都商合"
+      }
+    },
+    {
+      "path": "pages/index/shop",
+      "style": {
+        "navigationBarTitleText": "七都商合"
+      }
+    }
+  ],
+  "globalStyle": {
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "七都商合",
+    "navigationBarBackgroundColor": "#F8F8F8",
+    "backgroundColor": "#F8F8F8"
+  }
+}

@@ -1,0 +1,53 @@
+services:
+  pipelines:
+    container_name: open-webui-pipelines
+    image: ghcr.io/open-webui/pipelines:main
+    ports:
+      - "8991:9099"
+    networks:
+        - 1panel-network
+    volumes:
+      - ./pipelines:/app/pipelines
+    restart: always
+
+  open-webui:
+    container_name: open-webui
+    image: ghcr.io/open-webui/open-webui:cuda
+    ports:
+      - "8990:8080"
+    networks:
+        - 1panel-network
+    volumes:
+      - ./data:/app/backend/data
+    environment:
+      - WEBUI_URL=https://aigc.cm.example.com
+      - OLLAMA_BASE_URL=http://36.137.131.41:11434
+      - CORS_ALLOW_ORIGIN=https://aigc.cm.example.com
+      - USE_CUDA_DOCKER=true
+      - HF_ENDPOINT=https://hf-mirror.com
+      - ENABLE_OPENAI_API=false
+      - ENABLE_OAUTH_SIGNUP=true
+      - ENABLE_OAUTH_ROLE_MANAGEMENT=true
+      - OPENID_PROVIDER_URL=https://logto.cm.example.com/oidc/.well-known/openid-configuration
+      - OPENID_REDIRECT_URI=https://aigc.cm.example.com/oauth/oidc/callback
+      - OAUTH_CLIENT_ID=78jhr0hfemyzaw08r6n7b
+      - OAUTH_CLIENT_SECRET=ChangeMeOpenWebUISecret123!
+      - OAUTH_SCOPES=openid email profile
+      - OAUTH_PROVIDER_NAME=七都建发统一认证
+      - OAUTH_MERGE_ACCOUNTS_BY_EMAIL=true
+      - OAUTH_ALLOWED_ROLES=internal user
+      - OAUTH_ADMIN_ROLES=super admin
+    ipc: host
+    runtime: nvidia
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    restart: always
+    
+networks:
+    1panel-network:
+        external: true

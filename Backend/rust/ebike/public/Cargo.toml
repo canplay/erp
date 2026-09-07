@@ -1,0 +1,27 @@
+[package]
+name = "ebike"
+version = "0.1.0"
+authors = ["CaNplay <canplay@vip.qq.com>"]
+edition = "2024"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+log = "*"
+log4rs = "*"
+futures = "*"
+actix-web = "*"
+actix-cors = "*"
+serde = "*"
+serde_json = "*"
+sqlx = { version = "*", features = [ "runtime-actix-native-tls", "postgres", "mysql", "chrono", "json", "decimal" ] }
+rand = "*"
+lazy_static = "*"
+chrono = { version = "*", features = ["serde"] }
+anyhow = "*"
+reqwest = { version = "*", features = ["cookies", "gzip", "json"] }
+hex = "*"
+bytes = "*"
+uuid = { version = "*", features = ["v4"] }
+blake2 = "*"
+sha2 = "*"

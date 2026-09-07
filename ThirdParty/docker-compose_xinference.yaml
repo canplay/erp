@@ -1,0 +1,29 @@
+services:
+  xinference:
+    container_name: xinference
+    image: xprobe/xinference:latest
+    command: xinference-local -H 0.0.0.0 --auth-config /root/data/auth.json --log-level debug
+    restart: always
+    networks:
+      - 1panel-network
+    ports:
+      - 8995:9997
+    volumes:
+      - ./data:/root/data
+      - ./auth.json:/root/data/auth.json
+    environment:
+      - XINFERENCE_HOME=/root/data
+      - XINFERENCE_MODEL_SRC=modelscope
+    ipc: host
+    runtime: nvidia
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+networks:
+    1panel-network:
+        external: true

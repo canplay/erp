@@ -1,0 +1,33 @@
+[package]
+name = "towing"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+log = "*"
+log4rs = "*"
+futures = "*"
+actix-web = "*"
+actix-rt = "*"
+actix-multipart = "*"
+actix-cors = "*"
+actix-identity = "*"
+actix-session = { version = "*", features = ["cookie-session"] }
+actix-files = "*"
+serde = "*"
+serde_json = "*"
+rand = "*"
+chrono = { version = "*", features = ["serde"] }
+reqwest = { version = "*", features = ["cookies", "json", "gzip", "stream", "multipart"] }
+hex = "*"
+bytes = "*"
+uuid = { version = "*", features = ["v4", "serde"] }
+blake2 = "*"
+sha2 = "*"
+base64 = "*"
+sqlx = { version = "*", features = [ "runtime-actix-native-tls", "postgres", "chrono", "json", "uuid" ] }
+urlencoding = "*"
+anyhow = "*"
+bcrypt = "*"

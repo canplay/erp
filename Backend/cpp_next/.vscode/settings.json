@@ -1,0 +1,11 @@
+{
+  "robloxLsp.diagnostics.globals": [
+    "LogInfo",
+    "json_decode",
+    "SendWebSocketMessage",
+    "json_encode",
+    "RegisterHttpHandler",
+    "RegisterWebSocketController",
+    "BroadcastWebSocketMessage"
+  ]
+}

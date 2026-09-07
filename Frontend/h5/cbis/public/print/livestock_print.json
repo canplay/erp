@@ -1,0 +1,710 @@
+{
+  "panels": [
+    {
+      "index": 0,
+      "paperType": "自定义",
+      "height": 140,
+      "width": 241,
+      "paperHeader": 90,
+      "paperFooter": 330,
+      "printElements": [
+        {
+          "options": {
+            "left": 211.5,
+            "top": 10.5,
+            "height": 30,
+            "width": 259,
+            "title": "示例城市市追栗街畜牧交易市场",
+            "fontSize": 19.5,
+            "fontWeight": "bold",
+            "textAlign": "center",
+            "draggable": true,
+            "coordinateSync": true,
+            "widthHeightSync": true,
+            "right": 472.75,
+            "bottom": 39.75,
+            "vCenter": 343.25,
+            "hCenter": 24.75,
+            "textContentVerticalAlign": "middle",
+            "qrCodeLevel": 0
+          },
+          "printElementType": { "title": "自定义文本", "type": "text" }
+        },
+        {
+          "options": {
+            "left": 106.5,
+            "top": 10.5,
+            "height": 57,
+            "width": 57,
+            "textType": "qrcode",
+            "title": "https://qdsh.cm.example.com",
+            "coordinateSync": false,
+            "widthHeightSync": false,
+            "qrCodeLevel": 0,
+            "right": 163.5,
+            "bottom": 66.75,
+            "vCenter": 135,
+            "hCenter": 38.25
+          },
+          "printElementType": { "title": "qrcode", "type": "text" }
+        },
+        {
+          "options": {
+            "left": 28.5,
+            "top": 10.5,
+            "height": 57,
+            "width": 57,
+            "src": "https:/qdsh.cm.example.com/icons/favicon-96x96.png",
+            "fit": "",
+            "coordinateSync": false,
+            "widthHeightSync": false,
+            "right": 84.75,
+            "bottom": 67.5,
+            "vCenter": 56.25,
+            "hCenter": 39
+          },
+          "printElementType": { "title": "图片", "type": "image" }
+        },
+        {
+          "options": {
+            "left": 469.5,
+            "top": 40.5,
+            "height": 27,
+            "width": 150,
+            "title": "缴费编号",
+            "right": 618.75,
+            "bottom": 72.75,
+            "vCenter": 543.75,
+            "hCenter": 56.25,
+            "coordinateSync": false,
+            "widthHeightSync": false,
+            "fontSize": 12,
+            "textContentVerticalAlign": "middle",
+            "qrCodeLevel": 0,
+            "field": "no",
+            "testData": "2024022400001"
+          },
+          "printElementType": { "title": "文本", "type": "text" }
+        },
+        {
+          "options": {
+            "left": 250.5,
+            "top": 72,
+            "height": 18,
+            "width": 120,
+            "title": "电话",
+            "field": "phone",
+            "testData": "13800000001",
+            "coordinateSync": false,
+            "widthHeightSync": false,
+            "fontSize": 12,
+            "textContentVerticalAlign": "middle",
+            "qrCodeLevel": 0,
+            "right": 399.75,
+            "bottom": 95.25,
+            "vCenter": 339.75,
+            "hCenter": 86.25
+          },
+          "printElementType": { "title": "文本", "type": "text" }
+        },
+        {
+          "options": {
+            "left": 469.5,
+            "top": 72,
+            "height": 18,
+            "width": 183,
+            "title": "身份证",
+            "field": "idcard",
+            "testData": "532627138000000000",
+            "coordinateSync": false,
+            "widthHeightSync": false,
+            "fontSize": 12,
+            "textContentVerticalAlign": "middle",
+            "qrCodeLevel": 0,
+            "right": 635.25,
+            "bottom": 96,
+            "vCenter": 543.75,
+            "hCenter": 87
+          },
+          "printElementType": { "title": "文本", "type": "text" }
+        },
+        {
+          "options": {
+            "left": 28.5,
+            "top": 72,
+            "height": 18,
+            "width": 120,
+            "title": "货主",
+            "field": "name",
+            "testData": "张三",
+            "coordinateSync": false,
+            "widthHeightSync": false,
+            "fontSize": 12,
+            "textContentVerticalAlign": "middle",
+            "qrCodeLevel": 0,
+            "right": 150,
+            "bottom": 96,
+            "vCenter": 90,
+            "hCenter": 87
+          },
+          "printElementType": { "title": "文本", "type": "text" }
+        },
+        {
+          "options": {
+            "left": 550.5,
+            "top": 330,
+            "height": 16.5,
+            "width": 102,
+            "title": "日期",
+            "field": "create_date",
+            "testData": "2024.02.24",
+            "coordinateSync": false,
+            "widthHeightSync": false,
+            "fontSize": 12,
+            "textContentVerticalAlign": "middle",
+            "qrCodeLevel": 0,
+            "right": 650.25,
+            "bottom": 345.75,
+            "vCenter": 590.25,
+            "hCenter": 337.5
+          },
+          "printElementType": { "title": "文本", "type": "text" }
+        },
+        {
+          "options": {
+            "left": 28.5,
+            "top": 330,
+            "height": 16.5,
+            "width": 138,
+            "title": "客服电话:0876-2100000",
+            "coordinateSync": false,
+            "widthHeightSync": false,
+            "fontSize": 12,
+            "textContentVerticalAlign": "middle",
+            "qrCodeLevel": 0,
+            "right": 651.75,
+            "bottom": 375,
+            "vCenter": 579.75,
+            "hCenter": 366.75
+          },
+          "printElementType": { "title": "文本", "type": "text" }
+        },
+        {
+          "options": { "left": 28.5, "top": 103.5, "height": 9, "width": 624 },
+          "printElementType": { "type": "hline" }
+        },
+        {
+          "options": {
+            "left": 28.5,
+            "top": 103.5,
+            "height": 211.5,
+            "width": 9
+          },
+          "printElementType": { "type": "vline" }
+        },
+        {
+          "options": { "left": 28.5, "top": 315, "height": 9, "width": 624 },
+          "printElementType": { "type": "hline" }
+        },
+        {
+          "options": {
+            "left": 652.5,
+            "top": 103.5,
+            "height": 211.5,
+            "width": 9
+          },
+          "printElementType": { "type": "vline" }
+        },
+        {
+          "options": { "left": 28.5, "top": 129, "height": 9, "width": 624 },
+          "printElementType": { "type": "hline" }
+        },
+        {
+          "options": { "left": 105, "top": 103.5, "height": 166.5, "width": 9 },
+          "printElementType": { "type": "vline" }
+        },
+        {
+          "options": { "left": 28.5, "top": 154.5, "height": 9, "width": 624 },
+          "printElementType": { "type": "hline" }
+        },
+        {
+          "options": { "left": 105, "top": 177, "height": 9, "width": 547.5 },
+          "printElementType": { "type": "hline" }
+        },
+        {
+          "options": { "left": 105, "top": 199.5, "height": 9, "width": 547.5 },
+          "printElementType": { "type": "hline" }
+        },
+        {
+          "options": {
+            "left": 28.5,
+            "top": 112.5,
+            "height": 9.75,
+            "width": 76.5,
+            "title": "类  别",
+            "fontSize": 12,
+            "textAlign": "center"
+          },
+          "printElementType": { "type": "text" }
+        },
+        {
+          "options": {
+            "left": 105,
+            "top": 112.5,
+            "height": 9.75,
+            "width": 216,
+            "title": "数  量",
+            "fontSize": 12,
+            "textAlign": "center"
+          },
+          "printElementType": { "type": "text" }
+        },
+        {
+          "options": {
+            "left": 321,
+            "top": 112.5,
+            "height": 9.75,
+            "width": 192,
+            "title": "单  价",
+            "fontSize": 12,
+            "textAlign": "center"
+          },
+          "printElementType": { "type": "text" }
+        },
+        {
+          "options": {
+            "left": 513,
+            "top": 112.5,
+            "height": 9.75,
+            "width": 139.5,
+            "title": "金  额(元)",
+            "fontSize": 12,
+            "textAlign": "center"
+          },
+          "printElementType": { "type": "text" }
+        },
+        {
+          "options": { "left": 28.5, "top": 223.5, "height": 9, "width": 624 },
+          "printElementType": { "type": "hline" }
+        },
+        {
+          "options": { "left": 28.5, "top": 246, "height": 9, "width": 624 },
+          "printElementType": { "type": "hline" }
+        },
+        {
+          "options": { "left": 28.5, "top": 270, "height": 9, "width": 624 },
+          "printElementType": { "type": "hline" }
+        },
+        {
+          "options": { "left": 321, "top": 103.5, "height": 120, "width": 9 },
+          "printElementType": { "type": "vline" }
+        },
+        {
+          "options": { "left": 513, "top": 103.5, "height": 120, "width": 9 },
+          "printElementType": { "type": "vline" }
+        },
+        {
+          "options": {
+            "left": 28.5,
+            "top": 136.5,
+            "height": 9.75,
+            "width": 76.5,
+            "title": "牛只费用",
+            "fontSize": 12,
+            "textAlign": "center"
+          },
+          "printElementType": { "type": "text" }
+        },
+        {
+          "options": {
+            "left": 105,
+            "top": 136.5,
+            "height": 9.75,
+            "width": 216,
+            "field": "livestock_num",
+            "testData": "1",
+            "fontSize": 12,
+            "textAlign": "center"
+          },
+          "printElementType": { "type": "text" }
+        },
+        {
+          "options": {
+            "left": 321,
+            "top": 136.5,
+            "height": 9.75,
+            "width": 192,
+            "field": "livestock_price",
+            "testData": "10",
+            "fontSize": 12,
+            "textAlign": "center"
+          },
+          "printElementType": { "type": "text" }
+        },
+        {
+          "options": {
+            "left": 513,
+            "top": 136.5,
+            "height": 9.75,
+            "width": 139.5,
+            "field": "livestock_amount",
+            "testData": "10",
+            "fontSize": 12,
+            "textAlign": "center"
+          },
+          "printElementType": { "type": "text" }
+        },
+        {
+          "options": {
+            "left": 28.5,
+            "top": 184.5,
+            "height": 9.75,
+            "width": 76.5,
+            "title": "车辆费用",
+            "fontSize": 12,
+            "textAlign": "center"
+          },
+          "printElementType": { "type": "text" }
+        },
+        {
+          "options": {
+            "left": 105,
+            "top": 160.5,
+            "height": 9.75,
+            "width": 108,
+            "title": "摩托车(元)\n",
+            "fontSize": 12,
+            "textAlign": "center"
+          },
+          "printElementType": { "type": "text" }
+        },
+        {
+          "options": { "left": 213, "top": 154.5, "height": 69, "width": 9 },
+          "printElementType": { "type": "vline" }
+        },
+        {
+          "options": {
+            "left": 105,
+            "top": 184.5,
+            "height": 9.75,
+            "width": 108,
+            "title": "3",
+            "fontSize": 12,
+            "textAlign": "center"
+          },
+          "printElementType": { "type": "text" }
+        },
+        {
+          "options": {
+            "left": 213,
+            "top": 160.5,
+            "height": 9.75,
+            "width": 108,
+            "title": "三轮摩托车\n",
+            "fontSize": 12,
+            "textAlign": "center"
+          },
+          "printElementType": { "type": "text" }
+        },
+        {
+          "options": {
+            "left": 213,
+            "top": 184.5,
+            "height": 9.75,
+            "width": 108,
+            "title": "10",
+            "fontSize": 12,
+            "textAlign": "center"
+          },
+          "printElementType": { "type": "text" }
+        },
+        {
+          "options": {
+            "left": 321,
+            "top": 160.5,
+            "height": 9.75,
+            "width": 99,
+            "title": "7座及6米以下车辆",
+            "fontSize": 12,
+            "textAlign": "center"
+          },
+          "printElementType": { "type": "text" }
+        },
+        {
+          "options": { "left": 420, "top": 154.5, "height": 69, "width": 9 },
+          "printElementType": { "type": "vline" }
+        },
+        {
+          "options": {
+            "left": 420,
+            "top": 160.5,
+            "height": 9.75,
+            "width": 93,
+            "title": "6米至9.8米车辆",
+            "fontSize": 12,
+            "textAlign": "center"
+          },
+          "printElementType": { "type": "text" }
+        },
+        {
+          "options": {
+            "left": 513,
+            "top": 160.5,
+            "height": 9.75,
+            "width": 139.5,
+            "title": "9.8米以上及挂车",
+            "fontSize": 12,
+            "textAlign": "center"
+          },
+          "printElementType": { "type": "text" }
+        },
+        {
+          "options": {
+            "left": 321,
+            "top": 184.5,
+            "height": 9.75,
+            "width": 99,
+            "title": "10",
+            "fontSize": 12,
+            "textAlign": "center"
+          },
+          "printElementType": { "type": "text" }
+        },
+        {
+          "options": {
+            "left": 420,
+            "top": 184.5,
+            "height": 9.75,
+            "width": 93,
+            "title": "20",
+            "fontSize": 12,
+            "textAlign": "center"
+          },
+          "printElementType": { "type": "text" }
+        },
+        {
+          "options": {
+            "left": 513,
+            "top": 184.5,
+            "height": 9.75,
+            "width": 139.5,
+            "title": "50",
+            "fontSize": 12,
+            "textAlign": "center"
+          },
+          "printElementType": { "type": "text" }
+        },
+        {
+          "options": {
+            "left": 28.5,
+            "top": 231,
+            "height": 9.75,
+            "width": 76.5,
+            "title": "金额(元)",
+            "fontSize": 12,
+            "textAlign": "center"
+          },
+          "printElementType": { "type": "text" }
+        },
+        {
+          "options": {
+            "left": 105,
+            "top": 207,
+            "height": 9.75,
+            "width": 108,
+            "field": "car_1",
+            "fontSize": 12,
+            "textAlign": "center"
+          },
+          "printElementType": { "type": "text" }
+        },
+        {
+          "options": {
+            "left": 213,
+            "top": 207,
+            "height": 9.75,
+            "width": 108,
+            "field": "car_2",
+            "testData": "1",
+            "fontSize": 12,
+            "textAlign": "center"
+          },
+          "printElementType": { "type": "text" }
+        },
+        {
+          "options": {
+            "left": 321,
+            "top": 207,
+            "height": 9.75,
+            "width": 99,
+            "field": "car_3",
+            "fontSize": 12,
+            "textAlign": "center"
+          },
+          "printElementType": { "type": "text" }
+        },
+        {
+          "options": {
+            "left": 420,
+            "top": 207,
+            "height": 9.75,
+            "width": 93,
+            "field": "car_4",
+            "fontSize": 12,
+            "textAlign": "center"
+          },
+          "printElementType": { "type": "text" }
+        },
+        {
+          "options": {
+            "left": 513,
+            "top": 207,
+            "height": 9.75,
+            "width": 139.5,
+            "field": "car_5",
+            "fontSize": 12,
+            "textAlign": "center"
+          },
+          "printElementType": { "type": "text" }
+        },
+        {
+          "options": {
+            "left": 105,
+            "top": 231,
+            "height": 9.75,
+            "width": 547.5,
+            "field": "car_amount",
+            "testData": "10",
+            "fontSize": 12,
+            "textAlign": "center"
+          },
+          "printElementType": { "type": "text" }
+        },
+        {
+          "options": {
+            "left": 28.5,
+            "top": 253.5,
+            "height": 9.75,
+            "width": 76.5,
+            "title": "总计金额(元)\n",
+            "fontSize": 12,
+            "textAlign": "center"
+          },
+          "printElementType": { "type": "text" }
+        },
+        {
+          "options": { "left": 217.5, "top": 246, "height": 24, "width": 9 },
+          "printElementType": { "type": "vline" }
+        },
+        {
+          "options": {
+            "left": 217.5,
+            "top": 253.5,
+            "height": 9.75,
+            "width": 108,
+            "title": "现金",
+            "fontSize": 12,
+            "textAlign": "center"
+          },
+          "printElementType": { "type": "text" }
+        },
+        {
+          "options": { "left": 325.5, "top": 246, "height": 24, "width": 9 },
+          "printElementType": { "type": "vline" }
+        },
+        {
+          "options": { "left": 448.5, "top": 246, "height": 24, "width": 9 },
+          "printElementType": { "type": "vline" }
+        },
+        {
+          "options": {
+            "left": 448.5,
+            "top": 253.5,
+            "height": 9.75,
+            "width": 108,
+            "title": "收款码",
+            "fontSize": 12,
+            "textAlign": "center"
+          },
+          "printElementType": { "type": "text" }
+        },
+        {
+          "options": { "left": 556.5, "top": 246, "height": 24, "width": 9 },
+          "printElementType": { "type": "vline" }
+        },
+        {
+          "options": {
+            "left": 28.5,
+            "top": 289.5,
+            "height": 9.75,
+            "width": 108,
+            "title": "总计金额(大写)",
+            "fontSize": 12,
+            "textAlign": "center"
+          },
+          "printElementType": { "type": "text" }
+        },
+        {
+          "options": { "left": 136.5, "top": 270, "height": 45, "width": 9 },
+          "printElementType": { "type": "vline" }
+        },
+        {
+          "options": {
+            "left": 136.5,
+            "top": 289.5,
+            "height": 9.75,
+            "width": 516,
+            "field": "amount_capital",
+            "testData": "玖仟玖佰玖拾玖万玖仟玖佰玖拾玖元玖角玖分",
+            "fontSize": 12,
+            "textAlign": "center"
+          },
+          "printElementType": { "type": "text" }
+        },
+        {
+          "options": {
+            "left": 105,
+            "top": 253.5,
+            "height": 9.75,
+            "width": 112.5,
+            "field": "amount_lower",
+            "testData": "99999999.99",
+            "fontSize": 12,
+            "textAlign": "center"
+          },
+          "printElementType": { "type": "text" }
+        },
+        {
+          "options": {
+            "left": 325.5,
+            "top": 253.5,
+            "height": 9.75,
+            "width": 123,
+            "field": "amount_cash",
+            "testData": "99999999.99",
+            "fontSize": 12,
+            "textAlign": "center"
+          },
+          "printElementType": { "type": "text" }
+        },
+        {
+          "options": {
+            "left": 556.5,
+            "top": 253.5,
+            "height": 9.75,
+            "width": 96,
+            "field": "amount_qrcode",
+            "testData": "99999999.99",
+            "fontSize": 12,
+            "textAlign": "center"
+          },
+          "printElementType": { "type": "text" }
+        }
+      ],
+      "paperNumberLeft": 565.5,
+      "paperNumberTop": 374,
+      "paperNumberDisabled": true,
+      "fontFamily": "Microsoft YaHei"
+    }
+  ]
+}

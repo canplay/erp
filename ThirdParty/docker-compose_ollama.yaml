@@ -1,0 +1,31 @@
+networks:
+    1panel-network:
+        external: true
+services:
+    ollama:
+        container_name: ollama
+        deploy:
+            resources:
+                reservations:
+                  devices:
+                    - driver: nvidia
+                      count: all
+                      capabilities: [gpu]
+        image: ollama/ollama
+        networks:
+            - 1panel-network
+        ports:
+            - 11434:11434
+        restart: unless-stopped
+        volumes:
+            - ./data:/root/.ollama
+        runtime: nvidia
+        environment:
+            - NVIDIA_VISIBLE_DEVICES=all
+            - OLLAMA_ORIGINS=rag.cm.example.com,llm.cm.example.com,aigc.cm.example.com
+            - OLLAMA_DEBUG=0
+            - OLLAMA_SCHED_SPREAD=2
+            - OLLAMA_FLASH_ATTENTION=1
+            - OLLAMA_HOST=0.0.0.0
+            - LD_LIBRARY_PATH=/usr/local/nvidia/lib:/usr/local/nvidia/lib64
+            - NVIDIA_DRIVER_CAPABILITIES=compute,utility

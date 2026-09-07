@@ -1,0 +1,15 @@
+services:
+  app:
+    image: svhd/logto:latest
+    networks:
+      - 1panel-network
+    entrypoint: ["sh", "-c", "npm run cli db seed -- --swe && npm start"]
+    ports:
+      - 3001:3001
+      - 3002:3002
+    env_file:
+      - .env
+      
+networks:
+    1panel-network:
+        external: true

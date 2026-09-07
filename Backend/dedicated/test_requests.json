@@ -1,0 +1,182 @@
+{
+  "user": {
+    "register": {
+      "type": "user",
+      "action": "register",
+      "username": "testuser",
+      "password": "testpassword",
+      "profile": {
+        "nickname": "Test User",
+        "avatar": "avatar_url"
+      }
+    },
+    "login": {
+      "type": "user",
+      "action": "login",
+      "username": "testuser",
+      "password": "testpassword"
+    },
+    "logout": {
+      "type": "user",
+      "action": "logout",
+      "token": "user_token_here"
+    },
+    "profile": {
+      "type": "user",
+      "action": "profile",
+      "username": "testuser",
+      "token": "user_token_here"
+    }
+  },
+  "friend": {
+    "add_request": {
+      "type": "friend",
+      "action": "add_request",
+      "friend_name": "otheruser",
+      "message": "你好，我们加个好友吧",
+      "token": "user_token_here"
+    },
+    "request_response": {
+      "type": "friend",
+      "action": "request_response",
+      "requester_name": "otheruser",
+      "accept": true,
+      "token": "user_token_here"
+    },
+    "remove": {
+      "type": "friend",
+      "action": "remove",
+      "friend_name": "otheruser",
+      "token": "user_token_here"
+    },
+    "list": {
+      "type": "friend",
+      "action": "list",
+      "token": "user_token_here"
+    },
+    "requests": {
+      "type": "friend",
+      "action": "requests",
+      "token": "user_token_here"
+    },
+    "search": {
+      "type": "friend",
+      "action": "search",
+      "keyword": "test",
+      "token": "user_token_here"
+    }
+  },
+  "group": {
+    "create": {
+      "type": "group",
+      "action": "create",
+      "group_name": "测试群组",
+      "description": "这是一个测试群组",
+      "token": "user_token_here"
+    },
+    "join": {
+      "type": "group",
+      "action": "join",
+      "group_id": 1,
+      "token": "user_token_here"
+    },
+    "leave": {
+      "type": "group",
+      "action": "leave",
+      "group_id": 1,
+      "token": "user_token_here"
+    },
+    "list": {
+      "type": "group",
+      "action": "list",
+      "token": "user_token_here"
+    },
+    "members": {
+      "type": "group",
+      "action": "members",
+      "group_id": 1,
+      "token": "user_token_here"
+    },
+    "update": {
+      "type": "group",
+      "action": "update",
+      "group_id": 1,
+      "group_name": "新群组名称",
+      "description": "更新后的群组描述",
+      "token": "user_token_here"
+    },
+    "message": {
+      "type": "group",
+      "action": "message",
+      "group_id": 1,
+      "content": "这是一条群组消息",
+      "token": "user_token_here"
+    },
+    "transfer": {
+      "type": "group",
+      "action": "transfer",
+      "group_id": 1,
+      "new_owner_username": "otheruser",
+      "token": "user_token_here"
+    }
+  },
+  "like": {
+    "like": {
+      "type": "like",
+      "action": "like",
+      "target_type": "message",
+      "target_id": "1",
+      "token": "user_token_here"
+    },
+    "unlike": {
+      "type": "like",
+      "action": "unlike",
+      "target_type": "message",
+      "target_id": "1",
+      "token": "user_token_here"
+    },
+    "list": {
+      "type": "like",
+      "action": "list",
+      "target_type": "message",
+      "target_id": "1",
+      "token": "user_token_here"
+    },
+    "user_likes": {
+      "type": "like",
+      "action": "user_likes",
+      "token": "user_token_here"
+    }
+  },
+  "chat": {
+    "public": {
+      "type": "public",
+      "username": "testuser",
+      "data": "这是一条公共消息",
+      "token": "user_token_here"
+    },
+    "private": {
+      "type": "private",
+      "receiver": "otheruser",
+      "data": "这是一条私聊消息",
+      "token": "user_token_here"
+    },
+    "group": {
+      "type": "group",
+      "group_id": 1,
+      "data": "这是一条群组消息",
+      "token": "user_token_here"
+    }
+  },
+  "system": {
+    "heartbeat": {
+      "type": "system",
+      "data": "heartbeat",
+      "token": "user_token_here"
+    },
+    "close": {
+      "type": "system",
+      "data": "close"
+    }
+  }
+}

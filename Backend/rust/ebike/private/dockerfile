@@ -1,0 +1,27 @@
+FROM ubuntu:latest
+LABEL maintainer="canplay@vip.qq.com"
+EXPOSE 51530
+
+ENV TZ=Asia/Shanghai
+
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo '$TZ' > /etc/timezone \
+  && apt update && apt upgrade -y \
+  && apt install -y curl wget unzip sudo tar zip vim tzdata \
+  && apt clean && apt autoremove \
+  && groupadd -r canplay && useradd -r -g canplay canplay && mkdir /home/canplay && chown -R canplay:canplay /home \
+  && echo "root:0000" | chpasswd && echo "canplay:0000" | chpasswd && echo "canplay ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+
+USER canplay
+
+RUN echo "export ZIC=true\n" >> /home/canplay/.profile && echo "source ~/.profile" >> ~/.bashrc && mkdir /home/canplay/projects
+
+WORKDIR /home/canplay/projects
+
+COPY ./config.json .
+COPY ./log4rs.yaml .
+COPY ./target/release .
+
+VOLUME /home/canplay/projects/web
+RUN sudo chmod 777 -R /home/canplay/projects
+
+CMD ["/bin/bash", "-c", "./ebike"]

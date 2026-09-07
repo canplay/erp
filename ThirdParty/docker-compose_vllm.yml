@@ -1,0 +1,50 @@
+services:
+  bge-m3:
+    container_name: bge-m3
+    image: vllm/vllm-openai:latest
+    command: --model BAAI/bge-m3 --revision=g128 --dtype=auto --lora-dtype=auto --quantization=gptq --trust-remote-code --gpu-memory-utilization=0.9 --max_model_len=4096 --enable-prefix-caching
+    networks:
+      - 1panel-network
+    ports:
+      - 8995:8000
+    volumes:
+      - ./huggingface:/root/.cache/huggingface
+      - ./modelscope:/root/.cache/modelscope
+    environment:
+      - VLLM_USE_MODELSCOPE=true
+    ipc: host
+    runtime: nvidia
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+  deepseek-r1:
+    container_name: deepseek-r1-distill-qwen-14b-gptq-int4
+    image: vllm/vllm-openai:latest
+    command: --model tclf90/deepseek-r1-distill-qwen-14b-gptq-int4 --revision=g128 --dtype=auto --lora-dtype=auto --quantization=gptq --trust-remote-code --gpu-memory-utilization=0.9 --max_model_len=4096
+    networks:
+      - 1panel-network
+    ports:
+      - 8995:8000
+    volumes:
+      - ./huggingface:/root/.cache/huggingface
+      - ./modelscope:/root/.cache/modelscope
+    environment:
+      - VLLM_USE_MODELSCOPE=true
+    ipc: host
+    runtime: nvidia
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+networks:
+    1panel-network:
+        external: true

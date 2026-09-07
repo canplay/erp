@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package erp.hik;
+
+import "common.proto";
+
+service CouponService {
+  rpc update (Request) returns (Response) {}
+}
+
+message Request {
+  string id = 1;
+  string phone = 2;
+  int32 amount = 3;
+}

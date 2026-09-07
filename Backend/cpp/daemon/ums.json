@@ -1,0 +1,12 @@
+{
+	"ums": {
+		"appid": "${UMS_APPID}",
+		"appkey": "${UMS_APPKEY}",
+		"expires": 3600,
+		"mid": "${UMS_MID}",
+		"tid": "${UMS_TID}",
+		"time": "2022-12-18 14:20:29",
+		"token": "${UMS_TOKEN}",
+		"ysjc": "${UMS_YSJC}"
+	}
+}

@@ -1,0 +1,25 @@
+FROM harbor.cm.example.com/canplay/ubuntu:24.10
+
+ENV TZ=Asia/Shanghai
+
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo '$TZ' > /etc/timezone \
+  && apt update && apt upgrade -y \
+  && apt install -y curl wget unzip sudo tar zip vim tzdata \
+  && apt clean && apt autoremove \
+  && groupadd -r canplay && useradd -r -g canplay canplay && mkdir /home/canplay && chown -R canplay:canplay /home \
+  && echo "root:0000" | chpasswd && echo "canplay:0000" | chpasswd && echo "canplay ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+
+USER canplay
+
+RUN echo "export ZIC=true\n" >> /home/canplay/.profile && echo "source ~/.profile" >> ~/.bashrc && mkdir /home/canplay/projects
+
+WORKDIR /home/canplay/projects
+
+COPY /build/linux/x64/release/funeral .
+COPY /config.json .
+
+RUN sudo chmod 777 -R /home/canplay/projects
+
+LABEL maintainer="canplay@vip.qq.com"
+EXPOSE 51530
+CMD ["/bin/bash", "-c", "./funeral"]

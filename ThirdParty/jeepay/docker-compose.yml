@@ -1,0 +1,168 @@
+version: '3'
+
+services:
+  activemq:
+    build:
+      context: ./docker/activemq
+      dockerfile: Dockerfile
+    hostname: activemq
+    container_name: jeepay-activemq
+    image: jeepay-activemq:latest
+    restart: always
+    ports:
+      - "8161:8161"
+      - "61616:61616"
+    volumes:
+      - activemq:/opt/activemq
+      - ./docker/activemq/activemq.xml:/opt/activemq/conf/activemq.xml
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    networks:
+      jeepay:
+        ipv4_address: 172.30.0.11
+  payment:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        PORT: 9216
+        PLATFORM: payment
+    image: jeepay-payment:latest
+    restart: always
+    hostname: payment
+    container_name: jeepay-payment
+    ports:
+      - "8924:9216"
+    depends_on:
+      - activemq
+    networks:
+      jeepay:
+        ipv4_address: 172.30.0.21
+    volumes:
+      - ./logs/payment:/workspace/logs
+      - ./conf/payment/application.yml:/workspace/application.yml
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+  manager:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        PORT: 9217
+        PLATFORM: manager
+    image: jeepay-manager:latest
+    restart: always
+    hostname: manager
+    container_name: jeepay-manager
+    ports:
+      - "8925:9217"
+    depends_on:
+      - activemq
+    networks:
+      jeepay:
+        ipv4_address: 172.30.0.22
+    volumes:
+      - ./logs/manager:/workspace/logs
+      - ./conf/manager/application.yml:/workspace/application.yml
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+  merchant:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        PORT: 9218
+        PLATFORM: merchant
+    image: jeepay-merchant:latest
+    restart: always
+    hostname: merchant
+    container_name: jeepay-merchant
+    ports:
+      - "8926:9218"
+    depends_on:
+      - activemq
+    networks:
+      jeepay:
+        ipv4_address: 172.30.0.23
+    volumes:
+      - ./logs/merchant:/workspace/logs
+      - ./conf/merchant/application.yml:/workspace/application.yml
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+  ui-payment:
+    build:
+      context: ${UI_BASE_DIR}/jeepay-ui
+      dockerfile: Dockerfile
+      args:
+        PLATFORM: cashier
+    image: jeepay-ui-payment:latest
+    restart: always
+    hostname: payment-ui
+    container_name: jeepay-ui-payment
+    environment:
+      - BACKEND_HOST=172.30.0.21:9216
+    ports:
+      - "8927:80"
+    volumes:
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    depends_on:
+      - payment
+    networks:
+      jeepay:
+        ipv4_address: 172.30.0.31
+  ui-manager:
+    build:
+      context: ${UI_BASE_DIR}/jeepay-ui
+      dockerfile: Dockerfile
+      args:
+        PLATFORM: manager
+    image: jeepay-ui-manager:latest
+    restart: always
+    hostname: manager-ui
+    container_name: jeepay-ui-manager
+    environment:
+      - BACKEND_HOST=172.30.0.22:9217
+    ports:
+      - "8928:80"
+    volumes:
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    depends_on:
+      - manager
+    networks:
+      jeepay:
+        ipv4_address: 172.30.0.32
+  ui-merchant:
+    build:
+      context: ${UI_BASE_DIR}/jeepay-ui
+      dockerfile: Dockerfile
+      args:
+        PLATFORM: merchant
+    image: jeepay-ui-merchant:latest
+    restart: always
+    hostname: merchant-ui
+    container_name: jeepay-ui-merchant
+    environment:
+      - BACKEND_HOST=172.30.0.23:9218
+    ports:
+      - "8929:80"
+    volumes:
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    depends_on:
+      - merchant
+    networks:
+      jeepay:
+        ipv4_address: 172.30.0.33
+
+networks:
+  jeepay:
+    name: jeepay
+    ipam:
+      config:
+        - subnet: 172.30.0.0/16
+          gateway: 172.30.0.1
+
+volumes:
+  activemq:

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <title>打印</title>
+    <link href="../hiprint/css/hiprint.css" rel="stylesheet" />
+    <link href="../hiprint/css/print-lock.css" rel="stylesheet" />
+    <link rel="icon" type="image/ico" href="../favicon.ico" />
+  </head>
+  <body>
+    <div id="content"></div>
+    <div class="topBtn">
+      <a id="print" class="myBtn" href="javascript:;">立即打印</a>
+    </div>
+    <script src="../hiprint/plugins/jq-3.31.js"></script>
+    <script src="../hiprint/polyfill.min.js"></script>
+    <script src="../hiprint/plugins/jquery.minicolors.min.js"></script>
+    <script src="../hiprint/plugins/JsBarcode.all.min.js"></script>
+    <script src="../hiprint/plugins/qrcode.js"></script>
+    <script src="../hiprint/hiprint.bundle.js"></script>
+    <script src="../hiprint/plugins/jquery.hiwprint.js"></script>
+  </body>
+  <style>
+    .topBtn {
+      position: fixed;
+      bottom: 50%;
+      right: 0rem;
+      width: 10rem;
+      height: 2.2rem;
+      background-size: 100% auto;
+      z-index: 9999;
+    }
+    .myBtn {
+      background-color: #4caf50;
+      border: none;
+      color: white;
+      padding: 15px 32px;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      font-size: 16px;
+      width: 5.2rem;
+    }
+  </style>
+  <script>
+    function getURLParam(name) {
+      let reg = new RegExp('(^|&)' + name + '=([^&]*)(&|$)');
+      let r = window.location.search.substr(1).match(reg);
+      if (r != null) return r[2];
+      return null;
+    }
+
+    $(document).ready(() => {
+      let no = decodeURI(getURLParam('no'));
+      let name = decodeURI(getURLParam('name'));
+      let phone = decodeURI(getURLParam('phone'));
+      let idcard = decodeURI(getURLParam('idcard'));
+      let livestock_type = decodeURI(getURLParam('livestock_type'));
+      let livestock_price = decodeURI(getURLParam('livestock_price'));
+      let livestock_num = decodeURI(getURLParam('livestock_num'));
+      let livestock_amount = decodeURI(getURLParam('livestock_amount'));
+      let car_type = decodeURI(getURLParam('car_type'));
+      let car_price = decodeURI(getURLParam('car_price'));
+      let car_num = decodeURI(getURLParam('car_num'));
+      let car_amount = decodeURI(getURLParam('car_amount'));
+      let amount_cash = decodeURI(getURLParam('amount_cash'));
+      let amount_qrcode = decodeURI(getURLParam('amount_qrcode'));
+      let amount_lower = decodeURI(getURLParam('amount_lower'));
+      let amount_capital = decodeURI(getURLParam('amount_capital'));
+      let create_date = decodeURI(getURLParam('create_date'));
+
+      $.ajax({
+        url: './livestock_print.json',
+        type: 'GET',
+        dataType: 'json',
+        async: false,
+        success: function (data) {
+          hiprint.init();
+          let hiprintTemplate = new hiprint.PrintTemplate({
+            template: data,
+          });
+          hiprintTemplate.design('#content');
+
+          $('#print').click(function () {
+            hiprintTemplate.print({});
+          });
+        },
+      });
+    });
+  </script>
+</html>
