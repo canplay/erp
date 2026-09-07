@@ -1,22 +1,22 @@
-# ERP 系统 · 特种设备安全综合管理平台
+# DataFusion ERP · 多业务综合管理平台
 
-> 面向《特种设备使用管理规则》（TSG 08-2026）合规要求，覆盖"日管控、周排查、月调度"闭环管理的综合 ERP 平台。
+> 面向多行业中小微企业的综合管理平台，涵盖气瓶追溯、共享电单车、殡葬、拖车、消防、问卷调查等业务模块。
 
 ## 项目简介
 
-本项目为特种设备使用单位、监管机构、第三方服务商提供全生命周期安全管理能力，涵盖设备档案、巡检任务、隐患闭环、周排查、月调度、监管对接、应急联动、AI 智能识别（OCR）等核心业务模块。
+DataFusion ERP 是一套多业务综合管理平台，为气瓶追溯、共享电单车监管、殡葬服务、拖车救援、消防安全、问卷调查等多个垂直行业提供一站式 SaaS 管理解决方案。
 
 ## 目录结构
 
 ```
 erp/
 ├── backend/                    # 后端服务
-│   ├── cpp/                    # Drogon C++ 服务（主业务网关、各业务子服务）
+│   ├── cpp/                    # Drogon C++ 服务（18 个子服务）
 │   │   ├── hik/                # 海康摄像头接入
 │   │   ├── cbis/               # CBIS 业务
 │   │   ├── gateway/            # API 网关
 │   │   ├── notify/             # 通知服务
-│   │   ├── chat/               # 聊天服务
+│   │   ├── chat/               # 即时通讯
 │   │   ├── clean/              # 清洁服务
 │   │   ├── funeral/            # 殡葬业务
 │   │   ├── pay/                # 支付服务
@@ -28,18 +28,19 @@ erp/
 │   │   ├── common/             # 公共库
 │   │   ├── daemon/             # 守护进程
 │   │   ├── protos/             # gRPC Proto 定义
-│   │   └── config.json         # 配置模板（环境变量占位）
-│   ├── cpp_next/               # 下一代 C++ 服务（OIDC 认证、扩展模块）
-│   ├── rust/                   # Rust 服务
-│   │   ├── ebike/              # 电单车（private/public/utility 三crate）
+│   │   ├── config.json         # 配置模板（环境变量占位）
+│   │   └── config_debug.json   # 调试配置
+│   ├── cpp_next/               # 下一代 C++ 服务（OIDC 认证）
+│   ├── rust/                   # Actix Rust 服务
+│   │   ├── ebike/              # 电单车监管（private/public/utility）
 │   │   └── tow/                # 拖车业务
 │   ├── dedicated/              # 独立部署服务（Lua + Moon 框架）
-│   └── datafusion_schema.sql   # 数据库结构脚本（纯 DDL，49 表）
+│   └── datafusion_schema.sql   # 数据库结构脚本（纯 DDL）
 ├── frontend/                   # 前端应用
 │   ├── h5/                     # 移动端 H5 应用（Quasar + Vue 3）
-│   │   ├── qdsh/               # 气瓶追溯
+│   │   ├── qdsh/               # 气瓶追溯（七都商合）
 │   │   ├── qdzy/               # 气瓶作业
-│   │   ├── ebike/              # 电单车
+│   │   ├── ebike/              # 共享电踏车监管
 │   │   ├── tow/                # 拖车
 │   │   ├── funeral/            # 殡葬
 │   │   ├── mapz/               # 地图
@@ -54,7 +55,7 @@ erp/
 │   └── micro_frontend/         # 微前端
 │       ├── admin/              # 管理端
 │       └── user/               # 用户端
-├── thirdparty/                 # 第三方部署工具（已清理密钥，保留各自许可证）
+├── thirdparty/                 # 第三方部署工具
 │   ├── harbor/                 # 容器镜像仓库
 │   ├── sentry/                 # 错误监控
 │   ├── nakama/                 # 游戏服务器
@@ -62,7 +63,7 @@ erp/
 │   ├── hoppscotch/             # API 测试工具
 │   ├── logto/                  # 身份认证
 │   ├── jeepay/                 # 支付系统
-│   └── helm_*.yaml             # Kubernetes Helm 部署模板
+│   └── helm_*.yaml             # Helm 部署模板
 └── docs/                       # 文档
 ```
 
@@ -74,7 +75,6 @@ erp/
 | 前端框架 | Quasar 2 + Vue 3 + Pinia + Vite / Taro (UniApp) |
 | 数据库 | PostgreSQL |
 | 缓存 / 任务 | Redis |
-| AI / OCR | PaddleOCR (PaddleX) |
 | 容器化 | Docker / Podman / Kubernetes |
 | 部署 | Helm / docker-compose |
 
@@ -96,6 +96,7 @@ cd backend/cpp
 # 构建单个服务（hik/cbis/gateway/notify/chat/clean/funeral/pay/tow/repair/dingtalk/liveup/qdzy）
 xmake build hik
 xmake build cbis
+xmake build gateway
 
 # 构建全部
 xmake build
@@ -109,6 +110,13 @@ xmake build
 cd backend/rust/ebike
 cargo build --release
 cargo run --release
+```
+
+### 后端（Lua 独立部署）
+
+```bash
+cd backend/dedicated
+moon main.lua
 ```
 
 ### 前端
@@ -139,7 +147,7 @@ pnpm dev
 
 ```bash
 # 结构脚本（纯 DDL，无数据）
-psql -U postgres -d erp -f backend/datafusion_schema.sql
+psql -U postgres -d datafusion -f backend/datafusion_schema.sql
 ```
 
 ## 环境变量清单
