@@ -103,7 +103,7 @@ RUN cd /root && \
 
 RUN cd /root && \
     curl -fsSL https://code-server.dev/install.sh -o install.sh && \
-    sed -i "s|https://github.com|${GITHUB_PROXY}/https://github.com|g" install.sh && \
+    sed -i "s|https://github.com/coder/code-server/releases/download|${GITHUB_PROXY}/https://github.com/coder/code-server/releases/download|g" install.sh && \
     bash ./install.sh && \
     rm -f ./install.sh && \
     rm -rf /root/.cache/code-server
@@ -118,12 +118,20 @@ RUN /root/vcpkg/vcpkg integrate install && \
     ln -s /usr/bin/ccache /usr/local/bin/clang++
 
 RUN printf '#!/usr/bin/env bash\n\
-echo "root:${PASSWORD}" | chpasswd\n\
+set -e\n\
+printf "root:%%s\\n" "$PASSWORD" | chpasswd\n\
+mkdir -p /root/.config/code-server\n\
+cat > /root/.config/code-server/config.yaml <<EOF\n\
+bind-addr: 0.0.0.0:3000\n\
+auth: password\n\
+password: ${PASSWORD}\n\
+cert: false\n\
+EOF\n\
 /usr/sbin/sshd -D -e &\n\
-exec code-server --bind-addr 0.0.0.0:3000 --auth password\n' > /root/entrypoint.sh && \
+exec code-server\n' > /root/entrypoint.sh && \
     chmod +x /root/entrypoint.sh
 
 LABEL maintainer="canplay <canplay@vip.qq.com>"
 EXPOSE 22
 EXPOSE 3000
-CMD ["/root/entrypoint.sh"]
+ENTRYPOINT ["/root/entrypoint.sh"]
