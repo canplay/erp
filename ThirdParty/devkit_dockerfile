@@ -103,11 +103,10 @@ RUN cd /root && \
 
 RUN cd /root && \
     curl -fsSL https://code-server.dev/install.sh -o install.sh && \
-    sed -i "s|https://github.com/coder/code-server|${GITHUB_PROXY}/https://github.com/coder/code-server|g" install.sh && \
-    bash ./install.sh --version 4.90.0 && \
+    sed -i "s|https://github.com|${GITHUB_PROXY}/https://github.com|g" install.sh && \
+    bash ./install.sh && \
     rm -f ./install.sh && \
     rm -rf /root/.cache/code-server
-
 
 # RUN git config --system --unset url."${GITHUB_PROXY}/github.com/".insteadOf
 
