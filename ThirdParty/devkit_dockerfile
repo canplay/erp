@@ -78,15 +78,20 @@ RUN curl -o- ${GITHUB_PROXY}/https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.
     pnpm config set registry https://registry.npmmirror.com && \
     pnpm add -g @quasar/cli
 
-RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y \
+# sh.rustup.rs 在本网络解析/连接不可达（curl 6，复测稳定），改用 rsproxy 的
+# rustup-init 安装器（与 sh.rustup.rs 同源官方脚本的国内镜像）；
+# 工具链下载仍走下方 RUSTUP_DIST_SERVER=tuna，版本语义不变。
+RUN curl --proto '=https' --tlsv1.2 -sSf https://rsproxy.cn/rustup-init.sh | sh -s -- -y \
         --profile minimal \
         --default-toolchain stable \
         --target x86_64-unknown-linux-musl && \
     mkdir -p ${CARGO_HOME} && \
     echo '[source.crates-io]' > ${CARGO_HOME}/config.toml && \
-    echo "replace-with = 'ustc'" >> ${CARGO_HOME}/config.toml && \
-    echo '[source.ustc]' >> ${CARGO_HOME}/config.toml && \
-    echo "registry = 'https://mirrors.tuna.tsinghua.edu.cn/crates.io-index/'" >> ${CARGO_HOME}/config.toml
+    echo "replace-with = 'rsproxy-sparse'" >> ${CARGO_HOME}/config.toml && \
+    echo '[source.rsproxy-sparse]' >> ${CARGO_HOME}/config.toml && \
+    echo "registry = 'sparse+https://rsproxy.cn/index/'" >> ${CARGO_HOME}/config.toml && \
+    echo '[net]' >> ${CARGO_HOME}/config.toml && \
+    echo 'retry = 10' >> ${CARGO_HOME}/config.toml
 
 RUN git clone --depth 1 ${GITHUB_PROXY}/https://github.com/xmake-io/xmake.git && \
     cd xmake && \
@@ -101,9 +106,13 @@ RUN cd /root && \
     git reset --hard && \
     ln -s /root/vcpkg/vcpkg /usr/local/bin/vcpkg
 
+# 覆盖两处下载源（直连 github 不稳）：deb 下载 URL 与版本 JSON 源走 GITHUB_PROXY。
+# 注意不能改写 /releases/latest 兜底：它靠 curl %{url_effective} 重定向解析版本，
+# 经代理后拿到的是代理 URL 本体，版本串会变成 URL 文本（实测踩坑）。
 RUN cd /root && \
-    curl -fsSL https://code-server.dev/install.sh -o install.sh && \
+    curl -fsSL --retry 5 --retry-all-errors --connect-timeout 20 https://code-server.dev/install.sh -o install.sh && \
     sed -i "s|https://github.com/coder/code-server/releases/download|${GITHUB_PROXY}/https://github.com/coder/code-server/releases/download|g" install.sh && \
+    sed -i "s|https://api.github.com/repos/coder/code-server/releases|${GITHUB_PROXY}/https://api.github.com/repos/coder/code-server/releases|g" install.sh && \
     bash ./install.sh && \
     rm -f ./install.sh && \
     rm -rf /root/.cache/code-server
