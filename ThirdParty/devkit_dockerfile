@@ -1,4 +1,4 @@
-FROM gitea/runner-images:ubuntu-24.04-v26.10.01 AS builder
+FROM gitea/runner-images:ubuntu-24.04-v26.10.01
 
 ARG LLVM_VERSION=22
 ARG GITHUB_PROXY=https://gh-proxy.com
@@ -25,22 +25,33 @@ ENV PASSWORD=${PASSWORD:-ChangeMeDockerfile123!} \
     CC=clang \
     CXX=clang++
 
+# ── Layer 1: apt 源 + locale + 时区（极少变更）─────────────────────────────
 RUN echo "deb http://mirrors.aliyun.com/ubuntu/ $(. /etc/os-release && echo $UBUNTU_CODENAME) main restricted universe multiverse" > /etc/apt/sources.list && \
     echo "deb http://mirrors.aliyun.com/ubuntu/ $(. /etc/os-release && echo $UBUNTU_CODENAME)-updates main restricted universe multiverse" >> /etc/apt/sources.list && \
     echo "deb http://mirrors.aliyun.com/ubuntu/ $(. /etc/os-release && echo $UBUNTU_CODENAME)-backports main restricted universe multiverse" >> /etc/apt/sources.list && \
-    echo "deb http://mirrors.aliyun.com/ubuntu/ $(. /etc/os-release && echo $UBUNTU_CODENAME)-security main restricted universe multiverse" >> /etc/apt/sources.list
-
-RUN apt-get update -y && apt-get install -y locales && \
+    echo "deb http://mirrors.aliyun.com/ubuntu/ $(. /etc/os-release && echo $UBUNTU_CODENAME)-security main restricted universe multiverse" >> /etc/apt/sources.list && \
     echo "en_US.UTF-8 UTF-8" > /etc/locale.gen && \
+    ln -snf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && \
+    echo Asia/Shanghai > /etc/timezone
+
+# ── Layer 2: 基础工具（极少变更）─────────────────────────────────────────
+RUN apt-get update -y && \
+    apt-get install -y locales && \
     locale-gen en_US.UTF-8 && \
-    update-locale LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8
+    update-locale LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8 && \
+    apt-get install -y \
+        openssh-server ca-certificates curl wget git build-essential \
+        ccache ninja-build pkg-config autoconf autoconf-archive automake \
+        libtool libssl-dev zlib1g-dev gdb gdbserver rsync libmpfr-dev \
+        libgmp3-dev libmpc-dev bison flex procps lsb-release gnupg zsh \
+        fish libmariadb-dev libmariadb-dev-compat && \
+    apt-get autoremove -y && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 ENV LANG=en_US.UTF-8 \
     LC_ALL=en_US.UTF-8
 
-RUN ln -snf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && \
-    echo Asia/Shanghai > /etc/timezone && \
-    UBUNTU_CODENAME=$(. /etc/os-release && echo $UBUNTU_CODENAME) && \
+# ── Layer 3: LLVM 工具链（独立层，版本升级才重建）────────────────────────
+RUN UBUNTU_CODENAME=$(. /etc/os-release && echo $UBUNTU_CODENAME) && \
     wget -qO- https://apt.llvm.org/llvm-snapshot.gpg.key | gpg --dearmor > /etc/apt/trusted.gpg.d/llvm.gpg && \
     echo "deb https://mirrors.tuna.tsinghua.edu.cn/llvm-apt/${UBUNTU_CODENAME}/ llvm-toolchain-${UBUNTU_CODENAME}-${LLVM_VERSION} main" > /etc/apt/sources.list.d/llvm.list && \
     apt-get update -y && apt-get install -y \
@@ -48,70 +59,74 @@ RUN ln -snf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && \
         lldb-${LLVM_VERSION} \
         lld-${LLVM_VERSION} \
         libc++-${LLVM_VERSION}-dev \
-        libc++abi-${LLVM_VERSION}-dev \
-        openssh-server ca-certificates curl wget git build-essential \
-        ccache ninja-build pkg-config autoconf autoconf-archive automake \
-        libtool libssl-dev zlib1g-dev gdb gdbserver rsync libmpfr-dev \
-        libgmp3-dev libmpc-dev bison flex procps lsb-release gnupg zsh \
-        fish libmariadb-dev libmariadb-dev-compat && \
-    apt-get autoremove -y && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
+        libc++abi-${LLVM_VERSION}-dev && \
+    apt-get clean && rm -rf /var/lib/apt/lists/* && \
     update-alternatives --install /usr/bin/clang clang /usr/bin/clang-${LLVM_VERSION} 100 && \
     update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-${LLVM_VERSION} 100
 
+# ── Layer 4: SSH 配置（不变）─────────────────────────────────────────────
 RUN ssh-keygen -A && \
     sed -i 's/#PermitRootLogin.*/PermitRootLogin yes/' /etc/ssh/sshd_config && \
     sed -i 's/#PasswordAuthentication.*/PasswordAuthentication yes/' /etc/ssh/sshd_config && \
-    chmod 600 /etc/shadow && \
-    chmod 600 /etc/ssh/*_key && \
-    mkdir -p /run/sshd && \
-    chmod 755 /run/sshd
+    chmod 600 /etc/shadow && chmod 600 /etc/ssh/*_key && \
+    mkdir -p /run/sshd && chmod 755 /run/sshd
 
+# ── Layer 5: Node.js + pnpm + Quasar（Node 版本变更才重建）─────────────────
 RUN curl -o- ${GITHUB_PROXY}/https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.4/install.sh | bash && \
     sed -i "s|https://github.com|${GITHUB_PROXY}/https://github.com|g" $NVM_DIR/nvm.sh && \
     sed -i "s|https://raw.githubusercontent.com|${GITHUB_PROXY}/https://raw.githubusercontent.com|g" $NVM_DIR/nvm.sh && \
     . $NVM_DIR/nvm.sh && nvm install 24 && nvm use 24 && \
     npm config set registry https://registry.npmmirror.com && \
     npm install -g pnpm && \
-    export PATH="$PATH:/root/.local/share/pnpm/bin" && \
     pnpm config set registry https://registry.npmmirror.com && \
     pnpm add -g @quasar/cli
 
+# ── Layer 6: Rust 工具链（不变）──────────────────────────────────────────
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y \
         --profile minimal \
         --default-toolchain stable \
         --target x86_64-unknown-linux-musl && \
-    mkdir -p ${CARGO_HOME} && \
     echo '[source.crates-io]' > ${CARGO_HOME}/config.toml && \
     echo "replace-with = 'ustc'" >> ${CARGO_HOME}/config.toml && \
     echo '[source.ustc]' >> ${CARGO_HOME}/config.toml && \
     echo "registry = 'https://mirrors.tuna.tsinghua.edu.cn/crates.io-index/'" >> ${CARGO_HOME}/config.toml
 
-RUN git clone --depth 1 ${GITHUB_PROXY}/https://github.com/xmake-io/xmake.git && \
-    cd xmake && \
-    ./scripts/get.sh __local__ && cd .. && rm -rf xmake
+# ── Layer 7: CI 门禁预装（pip + cargo-audit，每次 CI 跳过安装）──────────
+# 这层是本次优化的核心：原来每个 CI job 都要跑 pip install + cargo install，
+# cargo-audit 编译 2+ 分钟。预装进镜像后 CI 直接调用。
+COPY Backend/tests/requirements.txt /tmp/requirements.txt
+RUN pip3 install --break-system-packages -r /tmp/requirements.txt && \
+    rm /tmp/requirements.txt && \
+    pip3 install --break-system-packages sqlglot
 
+RUN cargo install cargo-audit --locked && \
+    # advisory-db 预拉（CI 里 timeout 240 拉不下来就跳过，预拉后秒回）
+    git config --global url."${GITHUB_PROXY}/https://github.com/".insteadOf "https://github.com/" && \
+    cargo audit --version && \
+    # 预拉 advisory-db 到 ~/.cargo/advisory-db
+    git clone --depth 1 https://github.com/RustSec/advisory-db.git /root/.cargo/advisory-db 2>/dev/null || true
+
+# ── Layer 8: xmake（独立层）──────────────────────────────────────────────
+RUN git clone --depth 1 ${GITHUB_PROXY}/https://github.com/xmake-io/xmake.git && \
+    cd xmake && ./scripts/get.sh __local__ && cd .. && rm -rf xmake
+
+# ── Layer 9: vcpkg（独立层）──────────────────────────────────────────────
 RUN cd /root && \
     git clone --depth 1 ${GITHUB_PROXY}/https://github.com/microsoft/vcpkg.git && \
     cd vcpkg && \
     sed -i "s|https://github.com|${GITHUB_PROXY}/https://github.com|g" ./scripts/bootstrap.sh && \
     sed -i "s|https://raw.githubusercontent.com|${GITHUB_PROXY}/https://raw.githubusercontent.com|g" ./scripts/bootstrap.sh && \
-    ./bootstrap-vcpkg.sh && \
-    git reset --hard && \
-    ln -s /root/vcpkg/vcpkg /usr/local/bin/vcpkg
+    ./bootstrap-vcpkg.sh && git reset --hard && \
+    ln -s /root/vcpkg/vcpkg /usr/local/bin/vcpkg && \
+    /root/vcpkg/vcpkg integrate install
 
-RUN cd /root && \
-    curl -fsSL https://code-server.dev/install.sh -o install.sh && \
+# ── Layer 10: code-server（独立层）────────────────────────────────────────
+RUN curl -fsSL https://code-server.dev/install.sh -o install.sh && \
     sed -i "s|https://github.com/coder/code-server/releases/download|${GITHUB_PROXY}/https://github.com/coder/code-server/releases/download|g" install.sh && \
-    bash ./install.sh && \
-    rm -f ./install.sh && \
-    rm -rf /root/.cache/code-server
+    bash ./install.sh && rm -f ./install.sh && rm -rf /root/.cache/code-server
 
-# RUN git config --system --unset url."${GITHUB_PROXY}/github.com/".insteadOf
-
-RUN /root/vcpkg/vcpkg integrate install && \
-    mkdir -p /root/.ccache && \
+# ── Layer 11: ccache 软链 + entrypoint（不变）─────────────────────────────
+RUN mkdir -p /root/.ccache && \
     ln -s /usr/bin/ccache /usr/local/bin/gcc && \
     ln -s /usr/bin/ccache /usr/local/bin/g++ && \
     ln -s /usr/bin/ccache /usr/local/bin/clang && \
