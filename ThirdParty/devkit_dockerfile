@@ -10,7 +10,7 @@ ENV PASSWORD=${PASSWORD:-ChangeMeDockerfile123!} \
     GITHUB_PROXY=${GITHUB_PROXY} \
     NVM_DIR=/root/.nvm \
     NVM_NODEJS_ORG_MIRROR=https://npmmirror.com/mirrors/node \
-    PATH=$NVM_DIR:/root/.cargo/bin:/root/.local/bin:/root/vcpkg:/usr/lib/llvm-${LLVM_VERSION}/bin:$PATH \
+    PATH=/root/.local/share/pnpm/bin:/root/.cargo/bin:/root/.local/bin:/root/vcpkg:/usr/lib/llvm-${LLVM_VERSION}/bin:$PATH \
     VCPKG_ROOT=/root/vcpkg \
     CCACHE_DIR=/root/.ccache \
     RUSTUP_HOME=/root/.rustup \
@@ -34,17 +34,29 @@ RUN echo "deb http://mirrors.aliyun.com/ubuntu/ $(. /etc/os-release && echo $UBU
     ln -snf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && \
     echo Asia/Shanghai > /etc/timezone
 
-# ── Layer 2: 基础工具（极少变更）─────────────────────────────────────────
+# ── Layer 2: 基础工具 + CI 运行工具（极少变更）────────────────────────────
+# iproute2: HOSTGW 探测的 ip 命令；postgresql-client: init_test_db.sh 的 psql；
+# protobuf-compiler: grpc-proto build.rs 的 protoc；
+# docker-ce-cli + docker-compose-plugin: CD 在 devkit 里 docker build/compose（runner 挂 docker.sock）
 RUN apt-get update -y && \
     apt-get install -y locales && \
     locale-gen en_US.UTF-8 && \
     update-locale LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8 && \
+    install -m 0755 -d /etc/apt/keyrings && \
+    curl -fsSL https://mirrors.aliyun.com/docker-ce/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg && \
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://mirrors.aliyun.com/docker-ce/linux/ubuntu $(. /etc/os-release && echo $UBUNTU_CODENAME) stable" > /etc/apt/sources.list.d/docker.list && \
+    apt-get update -y && \
     apt-get install -y \
         openssh-server ca-certificates curl wget git build-essential \
         ccache ninja-build pkg-config autoconf autoconf-archive automake \
         libtool libssl-dev zlib1g-dev gdb gdbserver rsync libmpfr-dev \
         libgmp3-dev libmpc-dev bison flex procps lsb-release gnupg zsh \
-        fish libmariadb-dev libmariadb-dev-compat && \
+        fish libmariadb-dev libmariadb-dev-compat \
+        cmake python3-dev python3-pip \
+        libpng-dev libjpeg-dev libwebp-dev libffi-dev \
+        libsqlite3-dev libzstd-dev libbz2-dev uuid-dev libcap-dev liblzma-dev \
+        iproute2 postgresql-client protobuf-compiler libprotobuf-dev \
+        docker-ce-cli docker-compose-plugin && \
     apt-get autoremove -y && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 ENV LANG=en_US.UTF-8 \
@@ -52,8 +64,7 @@ ENV LANG=en_US.UTF-8 \
 
 # ── Layer 3: LLVM 工具链（独立层，版本升级才重建）────────────────────────
 RUN UBUNTU_CODENAME=$(. /etc/os-release && echo $UBUNTU_CODENAME) && \
-    wget -qO- https://apt.llvm.org/llvm-snapshot.gpg.key | gpg --dearmor > /etc/apt/trusted.gpg.d/llvm.gpg && \
-    echo "deb https://mirrors.tuna.tsinghua.edu.cn/llvm-apt/${UBUNTU_CODENAME}/ llvm-toolchain-${UBUNTU_CODENAME}-${LLVM_VERSION} main" > /etc/apt/sources.list.d/llvm.list && \
+    echo "deb [trusted=yes] https://mirrors.tuna.tsinghua.edu.cn/llvm-apt/${UBUNTU_CODENAME}/ llvm-toolchain-${UBUNTU_CODENAME}-${LLVM_VERSION} main" > /etc/apt/sources.list.d/llvm.list && \
     apt-get update -y && apt-get install -y \
         clang-${LLVM_VERSION} \
         lldb-${LLVM_VERSION} \
@@ -72,20 +83,27 @@ RUN ssh-keygen -A && \
     mkdir -p /run/sshd && chmod 755 /run/sshd
 
 # ── Layer 5: Node.js + pnpm + Quasar（Node 版本变更才重建）─────────────────
-RUN curl -o- ${GITHUB_PROXY}/https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.4/install.sh | bash && \
-    sed -i "s|https://github.com|${GITHUB_PROXY}/https://github.com|g" $NVM_DIR/nvm.sh && \
-    sed -i "s|https://raw.githubusercontent.com|${GITHUB_PROXY}/https://raw.githubusercontent.com|g" $NVM_DIR/nvm.sh && \
-    . $NVM_DIR/nvm.sh && nvm install 24 && nvm use 24 && \
+# 直接下载 Node.js 二进制（不走 nvm git clone —— gh-proxy 克隆 GitHub 常 TLS 断连）
+ARG NODE_VERSION=24.15.0
+RUN curl -fsSL https://npmmirror.com/mirrors/node/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-x64.tar.xz | \
+    tar -xJ -C /usr/local --strip-components=1 && \
+    node --version && npm --version && \
     npm config set registry https://registry.npmmirror.com && \
     npm install -g pnpm && \
+    pnpm setup && \
+    export PATH="/root/.local/share/pnpm/bin:$PATH" && \
     pnpm config set registry https://registry.npmmirror.com && \
     pnpm add -g @quasar/cli
 
 # ── Layer 6: Rust 工具链（不变）──────────────────────────────────────────
-RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y \
+# 下载 rustup-init 二进制后直接执行（不走 sh.rustup.rs 脚本，境内 DNS 常挂）
+RUN curl -fsSL -o /tmp/rustup-init https://mirrors.tuna.tsinghua.edu.cn/rustup/rustup/dist/x86_64-unknown-linux-gnu/rustup-init && \
+    chmod +x /tmp/rustup-init && \
+    /tmp/rustup-init -y \
         --profile minimal \
         --default-toolchain stable \
         --target x86_64-unknown-linux-musl && \
+    rm /tmp/rustup-init && \
     echo '[source.crates-io]' > ${CARGO_HOME}/config.toml && \
     echo "replace-with = 'ustc'" >> ${CARGO_HOME}/config.toml && \
     echo '[source.ustc]' >> ${CARGO_HOME}/config.toml && \
@@ -95,16 +113,16 @@ RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y \
 # 这层是本次优化的核心：原来每个 CI job 都要跑 pip install + cargo install，
 # cargo-audit 编译 2+ 分钟。预装进镜像后 CI 直接调用。
 COPY Backend/tests/requirements.txt /tmp/requirements.txt
-RUN pip3 install --break-system-packages -r /tmp/requirements.txt && \
+RUN pip3 install --break-system-packages -i https://pypi.tuna.tsinghua.edu.cn/simple -r /tmp/requirements.txt && \
     rm /tmp/requirements.txt && \
-    pip3 install --break-system-packages sqlglot
+    pip3 install --break-system-packages -i https://pypi.tuna.tsinghua.edu.cn/simple sqlglot
 
 RUN cargo install cargo-audit --locked && \
     # advisory-db 预拉（CI 里 timeout 240 拉不下来就跳过，预拉后秒回）
     git config --global url."${GITHUB_PROXY}/https://github.com/".insteadOf "https://github.com/" && \
     cargo audit --version && \
     # 预拉 advisory-db 到 ~/.cargo/advisory-db
-    git clone --depth 1 https://github.com/RustSec/advisory-db.git /root/.cargo/advisory-db 2>/dev/null || true
+    git clone --depth 1 ${GITHUB_PROXY}/https://github.com/RustSec/advisory-db.git /root/.cargo/advisory-db 2>/dev/null || true
 
 # ── Layer 8: xmake（独立层）──────────────────────────────────────────────
 RUN git clone --depth 1 ${GITHUB_PROXY}/https://github.com/xmake-io/xmake.git && \
