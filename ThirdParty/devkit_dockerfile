@@ -105,9 +105,9 @@ RUN curl -fsSL -o /tmp/rustup-init https://mirrors.tuna.tsinghua.edu.cn/rustup/r
         --target x86_64-unknown-linux-musl && \
     rm /tmp/rustup-init && \
     echo '[source.crates-io]' > ${CARGO_HOME}/config.toml && \
-    echo "replace-with = 'ustc'" >> ${CARGO_HOME}/config.toml && \
-    echo '[source.ustc]' >> ${CARGO_HOME}/config.toml && \
-    echo "registry = 'https://mirrors.tuna.tsinghua.edu.cn/crates.io-index/'" >> ${CARGO_HOME}/config.toml
+    echo "replace-with = 'rsproxy-sparse'" >> ${CARGO_HOME}/config.toml && \
+    echo '[source.rsproxy-sparse]' >> ${CARGO_HOME}/config.toml && \
+    echo "registry = 'sparse+https://rsproxy.cn/index/'" >> ${CARGO_HOME}/config.toml
 
 # ── Layer 7: CI 门禁预装（pip + cargo-audit，每次 CI 跳过安装）──────────
 # 这层是本次优化的核心：原来每个 CI job 都要跑 pip install + cargo install，
@@ -139,9 +139,14 @@ RUN cd /root && \
     /root/vcpkg/vcpkg integrate install
 
 # ── Layer 10: code-server（独立层）────────────────────────────────────────
-RUN curl -fsSL https://code-server.dev/install.sh -o install.sh && \
-    sed -i "s|https://github.com/coder/code-server/releases/download|${GITHUB_PROXY}/https://github.com/coder/code-server/releases/download|g" install.sh && \
-    bash ./install.sh && rm -f ./install.sh && rm -rf /root/.cache/code-server
+# 直接下载 code-server 二进制（code-server.dev 在境内 SSL 超时）
+ARG CS_VERSION=4.104.0
+RUN curl -fsSL -o /tmp/cs.tar.gz "${GITHUB_PROXY}/https://github.com/coder/code-server/releases/download/v${CS_VERSION}/code-server-${CS_VERSION}-linux-amd64.tar.gz" && \
+    tar -xzf /tmp/cs.tar.gz -C /opt && \
+    mv /opt/code-server-${CS_VERSION}-linux-amd64 /opt/code-server && \
+    ln -s /opt/code-server/bin/code-server /usr/local/bin/code-server && \
+    rm /tmp/cs.tar.gz && \
+    code-server --version
 
 # ── Layer 11: ccache 软链 + entrypoint（不变）─────────────────────────────
 RUN mkdir -p /root/.ccache && \
