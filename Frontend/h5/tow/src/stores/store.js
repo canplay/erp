@@ -2,7 +2,7 @@ import { defineStore, acceptHMRUpdate } from 'pinia'
 import { ref } from 'vue'
 
 export const useStore = defineStore('global', () => {
-  const backend = process.env.DEV ? 'http://127.0.0.1:51530' : 'https://tow.cm.example.com'
+  const backend = process.env.DEV ? 'http://127.0.0.1:51531' : ''
   const test = ref(false)
   const options = ref({
     system: null,

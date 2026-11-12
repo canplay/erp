@@ -14,7 +14,7 @@
           </q-btn>
 
           <q-toolbar-title class="col-auto desktop-only">
-            示例城市A市城乡投违章拖运处理平台
+            文山市交安公司车辆拖移系统
           </q-toolbar-title>
         </div>
 

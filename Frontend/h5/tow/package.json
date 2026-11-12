@@ -1,8 +1,8 @@
 {
   "name": "towing",
   "version": "0.0.1",
-  "description": "拖车管理系统",
-  "productName": "拖车管理系统",
+  "description": "文山市交安公司车辆拖移系统",
+  "productName": "文山市交安公司车辆拖移系统",
   "author": "canplay <canplay@vip.qq.com>",
   "type": "module",
   "private": true,
