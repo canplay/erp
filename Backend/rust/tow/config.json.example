@@ -1,0 +1,20 @@
+{
+  "_说明": "tow 服务配置（结构来自 src/main.rs 的 Conf 结构体，13 个字段）。mysql_* 四项代码完全未使用，填占位即可。url 是 actix 的 bind 地址，Dockerfile EXPOSE 51530。带 _说明/_待填 的键不是 Conf 字段，可删；serde 默认会拒绝未知字段吗？——不会，serde 默认忽略未知字段，保留注释键无害。",
+  "_待填": "pg_* 五项等 PostgreSQL 手动装完后填真实值；url/thread_num/upload_path 按部署环境调",
+
+  "url": "0.0.0.0:51530",
+  "pg_host": "127.0.0.1:5432",
+  "pg_name": "erp",
+  "pg_user": "erp",
+  "pg_pwd": "CHANGE_ME",
+
+  "mysql_host": "unused",
+  "mysql_name": "unused",
+  "mysql_user": "unused",
+  "mysql_pwd": "unused",
+
+  "refresh_rate": 30,
+  "register": true,
+  "thread_num": 4,
+  "upload_path": "/home/canplay/projects/web"
+}

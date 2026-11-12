@@ -113,18 +113,18 @@ CUSTOM_DNS="${CUSTOM_DNS:-222.172.200.68}"
 PROXY_PREFIX="${PROXY_PREFIX:-https://gh-proxy.com/}"
 
 # -------------------- 全局版本 --------------------
-RANCHER_VERSION="${RANCHER_VERSION:-2.14.2}"
+RANCHER_VERSION="${RANCHER_VERSION:-2.15.3}"
 RANCHER_PASSWORD="${RANCHER_PASSWORD:-$(openssl rand -base64 16 | tr -d '/+=')}"
-ROOK_VERSION="${ROOK_VERSION:-1.19.6}"
+ROOK_VERSION="${ROOK_VERSION:-1.21.2}"
 KUBEBLOCKS_VERSION="${KUBEBLOCKS_VERSION:-1.0.2}"
 CEPH_VERSION="${CEPH_VERSION:-20.2.1}"
-SNAPSHOTTER_VERSION="${SNAPSHOTTER_VERSION:-8.5.0}"
-CSI_ADDONS_VERSION="${CSI_ADDONS_VERSION:-v0.14.0}"
-RKE2_VERSION="${RKE2_VERSION:-1.35.5+rke2r2}"
+SNAPSHOTTER_VERSION="${SNAPSHOTTER_VERSION:-8.7.0}"
+CSI_ADDONS_VERSION="${CSI_ADDONS_VERSION:-v0.15.1}"
+RKE2_VERSION="${RKE2_VERSION:-1.37.2+rke2r1}"
 RKE2_IMAGES_TAR="rke2-images.linux-amd64.tar.zst"
-TRAEFIK_VERSION="${TRAEFIK_VERSION:-3.7.4}"
-CERT_MANAGER_VERSION="${CERT_MANAGER_VERSION:-1.20.2}"
-HELM_VERSION="${HELM_VERSION:-v3.20.2}"
+TRAEFIK_VERSION="${TRAEFIK_VERSION:-3.7.18}"
+CERT_MANAGER_VERSION="${CERT_MANAGER_VERSION:-1.21.3}"
+HELM_VERSION="${HELM_VERSION:-v3.22.1}"
 TLS_SOURCE="rancher"
 CEPH_DEVICES=""
 FORCE="false"
@@ -154,9 +154,9 @@ usage() {
   --lb-ip IP           负载均衡器IP（OpenResty或其他TCP代理），必须提前配置好转发 6443 和 9345 端口到所有master节点
 
 可选参数:
-  --rancher-ver VERSION   Rancher版本（默认2.14.2）
+  --rancher-ver VERSION   Rancher版本（默认2.15.3）
   --rancher-password PWD  Rancher初始admin密码（默认随机）
-  --rook-ver VERSION       Rook版本（默认1.19.6）
+  --rook-ver VERSION       Rook版本（默认1.21.2）
   --kb-ver VERSION         KubeBlocks版本（默认1.0.2）
   --ceph-version VERSION   Ceph集群镜像版本（默认20.2.1）
   --tls-source {letsEncrypt,selfSigned}  TLS来源（默认selfSigned）
@@ -1178,13 +1178,13 @@ if ! is_done "phase6_csi_addons"; then
     kubectl create namespace csi-addons-system --dry-run=client -o yaml | kubectl apply --server-side --force-conflicts -f -
     
     # 3.2 安装 CRDs
-    kubectl apply --server-side --force-conflicts -f "${PROXY_PREFIX}https://raw.githubusercontent.com/csi-addons/kubernetes-csi-addons/v0.14.0/deploy/controller/crds.yaml"
+    kubectl apply --server-side --force-conflicts -f "${PROXY_PREFIX}https://raw.githubusercontent.com/csi-addons/kubernetes-csi-addons/v0.15.1/deploy/controller/crds.yaml"
     
     # 3.3 安装 RBAC（此时命名空间已存在，不再报错）
-    kubectl apply --server-side --force-conflicts -f "${PROXY_PREFIX}https://raw.githubusercontent.com/csi-addons/kubernetes-csi-addons/v0.14.0/deploy/controller/rbac.yaml"
+    kubectl apply --server-side --force-conflicts -f "${PROXY_PREFIX}https://raw.githubusercontent.com/csi-addons/kubernetes-csi-addons/v0.15.1/deploy/controller/rbac.yaml"
     
     # 3.4 安装控制器本身
-    kubectl apply --server-side --force-conflicts -f "${PROXY_PREFIX}https://raw.githubusercontent.com/csi-addons/kubernetes-csi-addons/v0.14.0/deploy/controller/setup-controller.yaml"
+    kubectl apply --server-side --force-conflicts -f "${PROXY_PREFIX}https://raw.githubusercontent.com/csi-addons/kubernetes-csi-addons/v0.15.1/deploy/controller/setup-controller.yaml"
     
     # 4. 等待控制器就绪
     log_info "等待 CSI-Addons 控制器就绪..."
@@ -1205,7 +1205,7 @@ fi
 # ================== 阶段7：部署Traefik ==================
 if ! is_done "phase7_traefik"; then
     phase_start "部署Traefik Ingress Controller (高可用)"
-    TRAEFIK_CHART_VERSION="40.3.0"
+    TRAEFIK_CHART_VERSION="42.3.1"
     CHART_TARBALL="traefik-${TRAEFIK_CHART_VERSION}.tar.gz"
     PROXY_URL="${PROXY_PREFIX}https://github.com/traefik/traefik-helm-chart/archive/refs/tags/v${TRAEFIK_CHART_VERSION}.tar.gz"
     DIRECT_URL="https://github.com/traefik/traefik-helm-chart/archive/refs/tags/v${TRAEFIK_CHART_VERSION}.tar.gz"
@@ -1219,13 +1219,18 @@ if ! is_done "phase7_traefik"; then
     cd "traefik-helm-chart-${TRAEFIK_CHART_VERSION}/traefik"
 
     cat > traefik-override.yaml <<EOF
-replicas: 3
+deployment:
+  replicas: 3
 
 service:
-  type: NodePort
-  nodePorts:
-    http: 8000
-    https: 8001
+  spec:
+    type: NodePort
+
+ports:
+  web:
+    nodePort: 8900
+  websecure:
+    nodePort: 8901
 
 ingressClass:
   enabled: true
@@ -1285,7 +1290,10 @@ if ! is_done "phase8_cert_manager"; then
 
     tar -xzf "$CHART_TARBALL"
     cd "cert-manager-${CERT_MANAGER_VERSION}/deploy/charts/cert-manager"
-    mv "Chart.template.yaml" "Chart.yaml"
+    # v1.21+ 已有 Chart.yaml，旧版需要 mv Chart.template.yaml
+    if [[ -f "Chart.template.yaml" && ! -f "Chart.yaml" ]]; then
+        mv "Chart.template.yaml" "Chart.yaml"
+    fi
 
     cat > cert-manager-override.yaml <<EOF
 crds:
@@ -1294,22 +1302,23 @@ crds:
 replicaCount: 3
 
 image:
-  repository: docker.io/imroc/cert-manager-controller
+  repository: quay.io/jetstack/cert-manager-controller
   tag: v${CERT_MANAGER_VERSION}
 
 webhook:
   image:
-    repository: docker.io/imroc/cert-manager-webhook
+    repository: quay.io/jetstack/cert-manager-webhook
     tag: v${CERT_MANAGER_VERSION}
 
 cainjector:
   image:
-    repository: docker.io/imroc/cert-manager-cainjector
+    repository: quay.io/jetstack/cert-manager-cainjector
     tag: v${CERT_MANAGER_VERSION}
 
 startupapicheck:
+  enabled: false
   image:
-    repository: docker.io/imroc/cert-manager-startupapicheck
+    repository: quay.io/jetstack/cert-manager-startupapicheck
     tag: v${CERT_MANAGER_VERSION}
 
 resources:
@@ -1341,6 +1350,26 @@ EOF
         --timeout 10m \
         --wait \
         | tee -a "$MAIN_LOG"
+
+    # 等待 webhook TLS CA 注入完成（cainjector 需要时间）
+    log_info "等待 cert-manager webhook TLS 就绪..."
+    sleep 15
+    for i in {1..30}; do
+        if kubectl apply --dry-run=server -f - <<'TESTEOF' &>/dev/null
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: test-probe
+spec:
+  selfSigned: {}
+TESTEOF
+        then
+            log_info "webhook TLS 已就绪"
+            break
+        fi
+        log_detail "webhook TLS 未就绪... ($i/30)"
+        sleep 5
+    done
 
     log_info "创建 cert-manager 自签名 ClusterIssuer 及通配符证书示例"
     cat <<EOF | kubectl apply --server-side --force-conflicts -f -
@@ -1376,7 +1405,9 @@ if ! is_done "phase9_rancher"; then
 
     cd /root/rancher-install
 
-    helm repo add rancher-latest https://releases.rancher.com/server-charts/latest
+    # 优先国内镜像，回退官方
+helm repo add rancher-latest https://mirror.rancher.cn/server-charts/latest 2>/dev/null || \
+helm repo add rancher-latest https://releases.rancher.com/server-charts/latest
     helm repo update
 
     cat > rancher-override.yaml <<EOF
@@ -1450,7 +1481,7 @@ if ! is_done "phase10_kubeblocks"; then
     PROXY_KB="${PROXY_PREFIX}https://github.com/apecloud/kubeblocks/archive/refs/tags/v${KUBEBLOCKS_VERSION}.tar.gz"
     DIRECT_KB="https://github.com/apecloud/kubeblocks/archive/refs/tags/v${KUBEBLOCKS_VERSION}.tar.gz"
     if [[ ! -f "$CHART_TARBALL" ]]; then
-        download_with_progress "$CHART_TARBALL" "$PROXY_URL" "$DIRECT_URL"
+        download_with_progress "$CHART_TARBALL" "$PROXY_KB" "$DIRECT_KB"
     fi
 
     # -------------------- 解压并进入 Helm Chart 目录 --------------------
