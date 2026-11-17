@@ -117,6 +117,13 @@ RUN pip3 install --break-system-packages -i https://pypi.tuna.tsinghua.edu.cn/si
     rm /tmp/requirements.txt && \
     pip3 install --break-system-packages -i https://pypi.tuna.tsinghua.edu.cn/simple sqlglot
 
+# ── Layer 8: sccache（rust 编译缓存——CI/CD 加速核心）──────────────────
+# ccache 对 rust 无效（rustc 不走 gcc），sccache 是 rust 专用编译缓存。
+# 预装后 CI 编译可复用缓存（比冷编译快 3-10 倍）。
+RUN cargo install sccache --locked && \
+    echo '[build]' >> ${CARGO_HOME}/config.toml && \
+    echo 'rustc-wrapper = "/root/.cargo/bin/sccache"' >> ${CARGO_HOME}/config.toml
+
 RUN cargo install cargo-audit --locked && \
     # advisory-db 预拉（CI 里 timeout 240 拉不下来就跳过，预拉后秒回）
     git config --global url."${GITHUB_PROXY}/https://github.com/".insteadOf "https://github.com/" && \
