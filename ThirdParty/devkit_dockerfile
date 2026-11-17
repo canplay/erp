@@ -118,14 +118,24 @@ RUN mkdir -p ${ANDROID_HOME}/cmdline-tools && \
     mv ${ANDROID_HOME}/cmdline-tools/cmdline-tools ${ANDROID_HOME}/cmdline-tools/latest && \
     rm /tmp/cmdline-tools.zip
 ENV PATH=${ANDROID_HOME}/cmdline-tools/latest/bin:${ANDROID_HOME}/platform-tools:${PATH}
-RUN yes | sdkmanager --licenses >/dev/null 2>&1 && \
-    sdkmanager "platform-tools" "platforms;android-34" "build-tools;34.0.0"
+# Android SDK 组件（腾讯云镜像 zip 直下——替代 sdkmanager（dl.google.com 国内慢））
+RUN cd ${ANDROID_HOME} && \
+    curl -fsSL -o platform-tools.zip \
+        https://mirrors.cloud.tencent.com/AndroidSDK/platform-tools-latest-linux.zip && \
+    unzip -q platform-tools.zip && rm platform-tools.zip && \
+    curl -fsSL -o platforms-34.zip \
+        https://mirrors.cloud.tencent.com/AndroidSDK/platform-34_r03.zip && \
+    unzip -q platforms-34.zip && mv platforms/android-34 platforms/android-34.bak && \
+    mv android-34 platforms/android-34 && rmdir platforms/android-34.bak 2>/dev/null; rm platforms-34.zip && \
+    curl -fsSL -o build-tools.zip \
+        https://mirrors.cloud.tencent.com/AndroidSDK/build-tools_r34-linux.zip && \
+    unzip -q build-tools.zip && mv android-14 build-tools/34.0.0 2>/dev/null; rm build-tools.zip
 
 # Flutter（stable——国内镜像）
 ENV FLUTTER_HOME=/opt/flutter \
     PUB_HOSTED_URL=https://pub.flutter-io.cn \
     FLUTTER_STORAGE_BASE_URL=https://storage.flutter-io.cn
-RUN git clone --depth 1 -b stable https://github.com/flutter/flutter.git ${FLUTTER_HOME} && \
+RUN git clone --depth 1 -b stable ${GITHUB_PROXY}/https://github.com/flutter/flutter.git ${FLUTTER_HOME} && \
     ${FLUTTER_HOME}/bin/flutter config --no-analytics && \
     ${FLUTTER_HOME}/bin/flutter precache
 ENV PATH=${FLUTTER_HOME}/bin:${PATH}
