@@ -1,4 +1,4 @@
-FROM gitea/runner-images:ubuntu-latest-full
+FROM docker.m.daocloud.io/gitea/runner-images:ubuntu-latest-slim
 
 ARG LLVM_VERSION=23
 ARG GITHUB_PROXY=https://gh-proxy.com
