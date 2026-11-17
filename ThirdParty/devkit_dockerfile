@@ -101,7 +101,7 @@ RUN curl -fsSL -o /tmp/rustup-init https://rsproxy.cn/rustup/dist/x86_64-unknown
     chmod +x /tmp/rustup-init && \
     /tmp/rustup-init -y \
         --profile minimal \
-        --default-toolchain 1.100.0 \
+        --default-toolchain stable \
         --target x86_64-unknown-linux-musl && \
     rm /tmp/rustup-init && \
     echo '[source.crates-io]' > ${CARGO_HOME}/config.toml && \
