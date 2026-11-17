@@ -119,18 +119,17 @@ RUN mkdir -p ${ANDROID_HOME}/cmdline-tools && \
     mv ${ANDROID_HOME}/cmdline-tools/cmdline-tools ${ANDROID_HOME}/cmdline-tools/latest && \
     rm /tmp/cmdline-tools.zip
 ENV PATH=${ANDROID_HOME}/cmdline-tools/latest/bin:${ANDROID_HOME}/platform-tools:${PATH}
-# Android SDK 组件（腾讯云镜像 zip 直下——替代 sdkmanager（dl.google.com 国内慢））
-RUN cd ${ANDROID_HOME} && \
+# Android SDK 组件（混合：platform-tools/build-tools 腾讯云 zip + platforms 走 sdkmanager）
+RUN mkdir -p ${ANDROID_HOME}/platforms ${ANDROID_HOME}/build-tools && \
+    cd /tmp && \
     curl -fsSL -o platform-tools.zip \
         https://mirrors.cloud.tencent.com/AndroidSDK/platform-tools-latest-linux.zip && \
-    unzip -q platform-tools.zip && rm platform-tools.zip && \
-    curl -fsSL -o platforms-34.zip \
-        https://mirrors.cloud.tencent.com/AndroidSDK/platform-34_r03.zip && \
-    unzip -q platforms-34.zip && mv platforms/android-34 platforms/android-34.bak && \
-    mv android-34 platforms/android-34 && rmdir platforms/android-34.bak 2>/dev/null; rm platforms-34.zip && \
+    unzip -q platform-tools.zip -d ${ANDROID_HOME} && rm platform-tools.zip && \
     curl -fsSL -o build-tools.zip \
         https://mirrors.cloud.tencent.com/AndroidSDK/build-tools_r34-linux.zip && \
-    unzip -q build-tools.zip && mv android-14 build-tools/34.0.0 2>/dev/null; rm build-tools.zip
+    unzip -q build-tools.zip -d /tmp/bt && mv /tmp/bt/android-* ${ANDROID_HOME}/build-tools/34.0.0 && rm -rf /tmp/bt build-tools.zip && \
+    yes | sdkmanager --sdk_root=${ANDROID_HOME} --licenses >/dev/null 2>&1; \
+    sdkmanager --sdk_root=${ANDROID_HOME} "platforms;android-34"
 
 # Flutter（stable——国内镜像）
 ENV FLUTTER_HOME=/opt/flutter \
