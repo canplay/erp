@@ -1,4 +1,4 @@
-FROM docker.m.daocloud.io/gitea/runner-images:ubuntu-latest-slim
+FROM docker.m.daocloud.io/gitea/runner-images:ubuntu-latest-full
 
 ARG LLVM_VERSION=23
 ARG GITHUB_PROXY=https://gh-proxy.com
@@ -24,10 +24,10 @@ ENV PASSWORD=${PASSWORD:-ChangeMeDockerfile123!} \
     CXX=clang++
 
 # ── Layer 1: apt 源 + locale + 时区（极少变更）─────────────────────────────
-# Debian 源（slim 基础是 Debian 13 trixie——非 Ubuntu）
-RUN echo "deb http://mirrors.aliyun.com/debian/ $(. /etc/os-release && echo $VERSION_CODENAME) main contrib non-free non-free-firmware" > /etc/apt/sources.list && \
-    echo "deb http://mirrors.aliyun.com/debian/ $(. /etc/os-release && echo $VERSION_CODENAME)-updates main contrib non-free non-free-firmware" >> /etc/apt/sources.list && \
-    echo "deb http://mirrors.aliyun.com/debian-security/ $(. /etc/os-release && echo $VERSION_CODENAME)-security main contrib non-free non-free-firmware" >> /etc/apt/sources.list && \
+RUN echo "deb http://mirrors.aliyun.com/ubuntu/ $(. /etc/os-release && echo $UBUNTU_CODENAME) main restricted universe multiverse" > /etc/apt/sources.list && \
+    echo "deb http://mirrors.aliyun.com/ubuntu/ $(. /etc/os-release && echo $UBUNTU_CODENAME)-updates main restricted universe multiverse" >> /etc/apt/sources.list && \
+    echo "deb http://mirrors.aliyun.com/ubuntu/ $(. /etc/os-release && echo $UBUNTU_CODENAME)-backports main restricted universe multiverse" >> /etc/apt/sources.list && \
+    echo "deb http://mirrors.aliyun.com/ubuntu/ $(. /etc/os-release && echo $UBUNTU_CODENAME)-security main restricted universe multiverse" >> /etc/apt/sources.list && \
     echo "en_US.UTF-8 UTF-8" > /etc/locale.gen && \
     ln -snf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && \
     echo Asia/Shanghai > /etc/timezone
@@ -42,8 +42,8 @@ RUN apt-get update -y && \
     update-locale LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8 && \
     apt-get install -y ca-certificates curl gnupg && \
     install -m 0755 -d /etc/apt/keyrings && \
-    curl -fsSL https://mirrors.aliyun.com/docker-ce/linux/debian/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg && \
-    echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://mirrors.aliyun.com/docker-ce/linux/debian $(. /etc/os-release && echo $VERSION_CODENAME) stable" > /etc/apt/sources.list.d/docker.list && \
+    curl -fsSL https://mirrors.aliyun.com/docker-ce/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg && \
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://mirrors.aliyun.com/docker-ce/linux/ubuntu $(. /etc/os-release && echo $UBUNTU_CODENAME) stable" > /etc/apt/sources.list.d/docker.list && \
     apt-get update -y && \
     apt-get install -y \
         openssh-server ca-certificates curl wget git build-essential \
