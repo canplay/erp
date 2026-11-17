@@ -40,9 +40,10 @@ RUN apt-get update -y && \
     apt-get install -y locales && \
     locale-gen en_US.UTF-8 && \
     update-locale LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8 && \
+    apt-get install -y ca-certificates curl gnupg && \
     install -m 0755 -d /etc/apt/keyrings && \
-    curl -fsSL https://mirrors.aliyun.com/docker-ce/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg && \
-    echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://mirrors.aliyun.com/docker-ce/linux/ubuntu $(. /etc/os-release && echo $UBUNTU_CODENAME) stable" > /etc/apt/sources.list.d/docker.list && \
+    curl -fsSL https://mirrors.aliyun.com/docker-ce/linux/debian/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg && \
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://mirrors.aliyun.com/docker-ce/linux/debian $(. /etc/os-release && echo $VERSION_CODENAME) stable" > /etc/apt/sources.list.d/docker.list && \
     apt-get update -y && \
     apt-get install -y \
         openssh-server ca-certificates curl wget git build-essential \
@@ -63,8 +64,8 @@ ENV LANG=en_US.UTF-8 \
     RUSTUP_UPDATE_ROOT=https://rsproxy.cn/rustup
 
 # ── Layer 3: LLVM 工具链（独立层，版本升级才重建）────────────────────────
-RUN UBUNTU_CODENAME=$(. /etc/os-release && echo $UBUNTU_CODENAME) && \
-    echo "deb [trusted=yes] https://mirrors.tuna.tsinghua.edu.cn/llvm-apt/${UBUNTU_CODENAME}/ llvm-toolchain-${UBUNTU_CODENAME}-${LLVM_VERSION} main" > /etc/apt/sources.list.d/llvm.list && \
+RUN LLVM_CODENAME=$(. /etc/os-release && echo $VERSION_CODENAME) && \
+    echo "deb [trusted=yes] https://mirrors.tuna.tsinghua.edu.cn/llvm-apt/${LLVM_CODENAME}/ llvm-toolchain-${LLVM_CODENAME}-${LLVM_VERSION} main" > /etc/apt/sources.list.d/llvm.list && \
     apt-get update -y && apt-get install -y \
         clang-${LLVM_VERSION} \
         lldb-${LLVM_VERSION} \
