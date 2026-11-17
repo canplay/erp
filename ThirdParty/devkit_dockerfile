@@ -1,6 +1,6 @@
-FROM gitea/runner-images:ubuntu-24.04-v26.10.01
+FROM gitea/runner-images:ubuntu-latest-full
 
-ARG LLVM_VERSION=22
+ARG LLVM_VERSION=23
 ARG GITHUB_PROXY=https://gh-proxy.com
 ARG PASSWORD=ChangeMeDockerfile123!
 
@@ -16,9 +16,7 @@ ENV PASSWORD=${PASSWORD:-ChangeMeDockerfile123!} \
     RUSTUP_HOME=/root/.rustup \
     CARGO_HOME=/root/.cargo \
     RUSTUP_PERMIT_COPY_RENAME=1 \
-    RUSTUP_DIST_SERVER=https://mirrors.tuna.tsinghua.edu.cn/rustup \
-    RUSTUP_UPDATE_ROOT=https://mirrors.tuna.tsinghua.edu.cn/rustup/rustup \
-    CCACHE_COMPRESS=1 \
+        CCACHE_COMPRESS=1 \
     CCACHE_MAXSIZE=5G \
     CCACHE_COMPILERCHECK=content \
     XMAKE_ROOT="y" \
@@ -60,7 +58,9 @@ RUN apt-get update -y && \
     apt-get autoremove -y && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 ENV LANG=en_US.UTF-8 \
-    LC_ALL=en_US.UTF-8
+    LC_ALL=en_US.UTF-8 \
+    RUSTUP_DIST_SERVER=https://rsproxy.cn \
+    RUSTUP_UPDATE_ROOT=https://rsproxy.cn/rustup
 
 # ── Layer 3: LLVM 工具链（独立层，版本升级才重建）────────────────────────
 RUN UBUNTU_CODENAME=$(. /etc/os-release && echo $UBUNTU_CODENAME) && \
@@ -97,11 +97,11 @@ RUN curl -fsSL https://npmmirror.com/mirrors/node/v${NODE_VERSION}/node-v${NODE_
 
 # ── Layer 6: Rust 工具链（不变）──────────────────────────────────────────
 # 下载 rustup-init 二进制后直接执行（不走 sh.rustup.rs 脚本，境内 DNS 常挂）
-RUN curl -fsSL -o /tmp/rustup-init https://mirrors.tuna.tsinghua.edu.cn/rustup/rustup/dist/x86_64-unknown-linux-gnu/rustup-init && \
+RUN curl -fsSL -o /tmp/rustup-init https://rsproxy.cn/rustup/dist/x86_64-unknown-linux-gnu/rustup-init && \
     chmod +x /tmp/rustup-init && \
     /tmp/rustup-init -y \
         --profile minimal \
-        --default-toolchain stable \
+        --default-toolchain 1.100.0 \
         --target x86_64-unknown-linux-musl && \
     rm /tmp/rustup-init && \
     echo '[source.crates-io]' > ${CARGO_HOME}/config.toml && \
