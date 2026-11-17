@@ -93,7 +93,8 @@ RUN curl -fsSL https://npmmirror.com/mirrors/node/v${NODE_VERSION}/node-v${NODE_
     pnpm setup && \
     export PATH="/root/.local/share/pnpm/bin:$PATH" && \
     pnpm config set registry https://registry.npmmirror.com && \
-    pnpm add -g @quasar/cli
+    pnpm add -g @quasar/cli && \
+    pnpm add -g turbo @tarojs/cli
 
 # ── Layer 6: Rust 工具链（不变）──────────────────────────────────────────
 # 下载 rustup-init 二进制后直接执行（不走 sh.rustup.rs 脚本，境内 DNS 常挂）
