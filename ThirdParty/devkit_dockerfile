@@ -87,16 +87,20 @@ RUN ssh-keygen -A && \
     mkdir -p /run/sshd && chmod 755 /run/sshd
 
 # ── Layer 5: Node.js + pnpm + Quasar（Node 版本变更才重建）─────────────────
-# 直接下载 Node.js 二进制（不走 nvm git clone —— gh-proxy 克隆 GitHub 常 TLS 断连）
+# nvm 安装 Node.js（gh-proxy 加速），再由 nvm 环境装 npm + pnpm
 ARG NODE_VERSION=26.13.1
-RUN curl -fsSL https://npmmirror.com/mirrors/node/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-x64.tar.xz | \
-    tar -xJ -C /usr/local --strip-components=1 && \
+RUN curl -fsSL "${GITHUB_PROXY}/https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh" | bash && \
+    export NVM_DIR=/root/.nvm && . "$NVM_DIR/nvm.sh" && \
+    nvm install ${NODE_VERSION} && nvm alias default ${NODE_VERSION} && \
     node --version && npm --version && \
+    ln -sf "$NVM_DIR/versions/node/v${NODE_VERSION}/bin/node" /usr/local/bin/node && \
+    ln -sf "$NVM_DIR/versions/node/v${NODE_VERSION}/bin/npm" /usr/local/bin/npm && \
+    ln -sf "$NVM_DIR/versions/node/v${NODE_VERSION}/bin/npx" /usr/local/bin/npx && \
+    npm config set registry https://registry.npmmirror.com && \
     curl -fsSL https://get.pnpm.io/install.sh | sed "s|https://github.com|${GITHUB_PROXY}/https://github.com|g" | SHELL=/bin/bash sh - && \
     export PNPM_HOME=/root/.local/share/pnpm && \
     export PATH="$PNPM_HOME:$PNPM_HOME/bin:$PATH" && \
     hash -r && pnpm --version && \
-    npm config set registry https://registry.npmmirror.com && \
     pnpm config set registry https://registry.npmmirror.com && \
     pnpm add -g @quasar/cli && pnpm add -g turbo @tarojs/cli && \
     export PATH="$(pnpm bin -g):$PATH" && hash -r
