@@ -96,6 +96,7 @@ RUN curl -fsSL https://npmmirror.com/mirrors/node/v${NODE_VERSION}/node-v${NODE_
     export PNPM_HOME=/root/.local/share/pnpm && \
     export PATH="$PNPM_HOME:$PNPM_HOME/bin:$PATH" && \
     hash -r && pnpm --version && \
+    npm config set registry https://registry.npmmirror.com && \
     pnpm config set registry https://registry.npmmirror.com && \
     pnpm add -g @quasar/cli && pnpm add -g turbo @tarojs/cli && \
     export PATH="$(pnpm bin -g):$PATH" && hash -r
