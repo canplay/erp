@@ -107,15 +107,23 @@ RUN curl -fsSL "${GITHUB_PROXY}/https://raw.githubusercontent.com/nvm-sh/nvm/v0.
 
 
 # ── Layer 5.5: Flutter + Android SDK（移动端构建工具链）──────────────────
-# Flutter stable + JDK 21 + Android SDK 34（国内镜像加速）。
+# Flutter stable + Microsoft OpenJDK 25.0.5.0.2 + Android SDK 34（国内镜像加速）。
 # 用于 portal 小程序打包 APK / Flutter 混编。
+ARG JDK_VERSION=25.0.5.0.2
 RUN apt-get update && apt-get install -y --no-install-recommends \
-        openjdk-21-jdk-headless \
         unzip \
         xz-utils \
         curl \
         git && \
-    rm -rf /var/lib/apt/lists/*
+    rm -rf /var/lib/apt/lists/* && \
+    curl -fsSL -o /tmp/jdk.tar.gz https://aka.ms/download-jdk/microsoft-jdk-${JDK_VERSION}-linux-x64.tar.gz && \
+    mkdir -p /opt/java && tar -xzf /tmp/jdk.tar.gz -C /opt/java --strip-components=1 && rm /tmp/jdk.tar.gz && \
+    ln -sf /opt/java/bin/java /usr/local/bin/java && \
+    ln -sf /opt/java/bin/javac /usr/local/bin/javac && \
+    ln -sf /opt/java/bin/jar /usr/local/bin/jar && \
+    java -version
+
+ENV JAVA_HOME=/opt/java
 
 # Android SDK（cmdline-tools + platform-tools + build-tools + platforms）
 ENV ANDROID_HOME=/opt/android-sdk \
