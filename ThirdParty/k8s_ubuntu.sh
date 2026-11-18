@@ -1205,7 +1205,7 @@ fi
 # ================== 阶段7：部署Traefik ==================
 if ! is_done "phase7_traefik"; then
     phase_start "部署Traefik Ingress Controller (高可用)"
-    TRAEFIK_CHART_VERSION="42.3.1"
+    TRAEFIK_CHART_VERSION="42.4.1"
     CHART_TARBALL="traefik-${TRAEFIK_CHART_VERSION}.tar.gz"
     PROXY_URL="${PROXY_PREFIX}https://github.com/traefik/traefik-helm-chart/archive/refs/tags/v${TRAEFIK_CHART_VERSION}.tar.gz"
     DIRECT_URL="https://github.com/traefik/traefik-helm-chart/archive/refs/tags/v${TRAEFIK_CHART_VERSION}.tar.gz"
