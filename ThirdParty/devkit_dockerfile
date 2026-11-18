@@ -92,10 +92,9 @@ ARG NODE_VERSION=24.15.0
 RUN curl -fsSL https://npmmirror.com/mirrors/node/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-x64.tar.xz | \
     tar -xJ -C /usr/local --strip-components=1 && \
     node --version && npm --version && \
-    npm config set registry https://registry.npmmirror.com && \
-    npm install -g pnpm && \
-    pnpm setup && \
-    export PATH="/root/.local/share/pnpm/bin:$PATH" && \
+    export COREPACK_NPM_REGISTRY=https://registry.npmmirror.com && \
+    corepack enable && corepack prepare pnpm@latest --activate && \
+    pnpm --version && \
     pnpm config set registry https://registry.npmmirror.com && \
     pnpm add -g @quasar/cli && \
     pnpm add -g turbo @tarojs/cli
