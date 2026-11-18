@@ -88,7 +88,7 @@ RUN ssh-keygen -A && \
 
 # ── Layer 5: Node.js + pnpm + Quasar（Node 版本变更才重建）─────────────────
 # 直接下载 Node.js 二进制（不走 nvm git clone —— gh-proxy 克隆 GitHub 常 TLS 断连）
-ARG NODE_VERSION=24.15.0
+ARG NODE_VERSION=26.13.1
 RUN curl -fsSL https://npmmirror.com/mirrors/node/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-x64.tar.xz | \
     tar -xJ -C /usr/local --strip-components=1 && \
     node --version && npm --version && \
@@ -196,7 +196,7 @@ RUN cd /root && \
 
 # ── Layer 10: code-server（独立层）────────────────────────────────────────
 # 直接下载 code-server 二进制（code-server.dev 在境内 SSL 超时）
-ARG CS_VERSION=4.104.0
+ARG CS_VERSION=4.145.2
 RUN curl -fsSL -o /tmp/cs.tar.gz "${GITHUB_PROXY}/https://github.com/coder/code-server/releases/download/v${CS_VERSION}/code-server-${CS_VERSION}-linux-amd64.tar.gz" && \
     tar -xzf /tmp/cs.tar.gz -C /opt && \
     mv /opt/code-server-${CS_VERSION}-linux-amd64 /opt/code-server && \
