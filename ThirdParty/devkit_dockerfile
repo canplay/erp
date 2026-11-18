@@ -13,7 +13,7 @@ ENV PASSWORD=${PASSWORD:-ChangeMeDockerfile123!} \
     GITHUB_PROXY=${GITHUB_PROXY} \
     NVM_DIR=/root/.nvm \
     NVM_NODEJS_ORG_MIRROR=https://npmmirror.com/mirrors/node \
-    PATH=/root/.local/share/pnpm/bin:/root/.cargo/bin:/root/.local/bin:/root/vcpkg:/usr/lib/llvm-${LLVM_VERSION}/bin:$PATH \
+    PATH=/root/.local/share/pnpm:/root/.cargo/bin:/root/.local/bin:/root/vcpkg:/usr/lib/llvm-${LLVM_VERSION}/bin:$PATH \
     VCPKG_ROOT=/root/vcpkg \
     CCACHE_DIR=/root/.ccache \
     RUSTUP_HOME=/root/.rustup \
@@ -92,8 +92,8 @@ ARG NODE_VERSION=24.15.0
 RUN curl -fsSL https://npmmirror.com/mirrors/node/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-x64.tar.xz | \
     tar -xJ -C /usr/local --strip-components=1 && \
     node --version && npm --version && \
-    export COREPACK_NPM_REGISTRY=https://registry.npmmirror.com && \
-    corepack enable && corepack prepare pnpm@latest --activate && \
+    curl -fsSL https://get.pnpm.io/install.sh | sed "s|https://github.com|${GITHUB_PROXY}/https://github.com|g" | SHELL=/bin/bash sh - && \
+    export PNPM_HOME=/root/.local/share/pnpm && export PATH="$PNPM_HOME:$PATH" && \
     pnpm --version && \
     pnpm config set registry https://registry.npmmirror.com && \
     pnpm add -g @quasar/cli && \
