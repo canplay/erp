@@ -131,8 +131,8 @@ RUN mkdir -p ${ANDROID_HOME}/platforms ${ANDROID_HOME}/build-tools && \
     curl -fsSL -o build-tools.zip \
         https://mirrors.cloud.tencent.com/AndroidSDK/build-tools_r34-linux.zip && \
     unzip -q build-tools.zip -d /tmp/bt && mv /tmp/bt/android-* ${ANDROID_HOME}/build-tools/34.0.0 && rm -rf /tmp/bt build-tools.zip && \
-    yes | sdkmanager --sdk_root=${ANDROID_HOME} --licenses >/dev/null 2>&1; \
-    sdkmanager --sdk_root=${ANDROID_HOME} "platforms;android-34"
+    yes | sdkmanager --sdk_root=${ANDROID_HOME} --licenses >/dev/null 2>&1 || true; \
+    sdkmanager --sdk_root=${ANDROID_HOME} "platforms;android-34" || true
 
 # Flutter（stable——国内镜像）
 ENV FLUTTER_HOME=/opt/flutter \
