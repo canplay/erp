@@ -63,8 +63,8 @@ RUN apt-get update -y && \
 
 ENV LANG=en_US.UTF-8 \
     LC_ALL=en_US.UTF-8 \
-    RUSTUP_DIST_SERVER=https://rsproxy.cn \
-    RUSTUP_UPDATE_ROOT=https://rsproxy.cn/rustup
+    RUSTUP_DIST_SERVER=https://mirrors.ustc.edu.cn/rust-static \
+    RUSTUP_UPDATE_ROOT=https://mirrors.ustc.edu.cn/rust-static/rustup
 
 # ── Layer 3: LLVM 工具链（独立层，版本升级才重建）────────────────────────
 RUN LLVM_CODENAME=$(. /etc/os-release && echo $VERSION_CODENAME) && \
@@ -89,7 +89,8 @@ RUN ssh-keygen -A && \
 # ── Layer 5: Node.js + pnpm + Quasar（Node 版本变更才重建）─────────────────
 # nvm 安装 Node.js（gh-proxy 加速），再由 nvm 环境装 npm + pnpm
 ARG NODE_VERSION=26.13.1
-RUN curl -fsSL "${GITHUB_PROXY}/https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh" | bash && \
+RUN git config --global url."${GITHUB_PROXY}/https://github.com/".insteadOf "https://github.com/" && \
+    curl -fsSL "${GITHUB_PROXY}/https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh" | bash && \
     export NVM_DIR=/root/.nvm && . "$NVM_DIR/nvm.sh" && \
     nvm install ${NODE_VERSION} && nvm alias default ${NODE_VERSION} && \
     node --version && npm --version && \
@@ -158,7 +159,7 @@ ENV PATH=${FLUTTER_HOME}/bin:${PATH}
 
 # ── Layer 6: Rust 工具链（不变）──────────────────────────────────────────
 # 下载 rustup-init 二进制后直接执行（不走 sh.rustup.rs 脚本，境内 DNS 常挂）
-RUN curl -fsSL -o /tmp/rustup-init https://rsproxy.cn/rustup/dist/x86_64-unknown-linux-gnu/rustup-init && \
+RUN curl -fsSL -o /tmp/rustup-init https://mirrors.ustc.edu.cn/rust-static/rustup/dist/x86_64-unknown-linux-gnu/rustup-init && \
     chmod +x /tmp/rustup-init && \
     /tmp/rustup-init -y \
         --profile minimal \
